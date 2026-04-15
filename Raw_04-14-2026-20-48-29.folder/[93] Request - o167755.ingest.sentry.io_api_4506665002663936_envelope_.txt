@@ -1,0 +1,15 @@
+POST /api/4506665002663936/envelope/ HTTP/1.1
+Host: o167755.ingest.sentry.io
+Content-Type: application/x-sentry-envelope
+Accept-Encoding: gzip, deflate, br
+Connection: keep-alive
+Accept: */*
+Content-Encoding: gzip
+User-Agent: sentry.cocoa/8.43.0
+X-Sentry-Auth: Sentry sentry_version=7,sentry_client=sentry.cocoa/8.43.0,sentry_key=b4467e69d3bb592c90f235f9456081e2
+Content-Length: 391
+Accept-Language: en-GB,en-US;q=0.9,en;q=0.8
+
+{"sdk":{"packages":[{"name":"carthage:getsentry\/sentry.cocoa","version":"8.43.0"}],"features":["captureFailedRequests"],"integrations":["NetworkTracking","AutoSessionTracking","Crash","AutoBreadcrumbTracking"],"name":"sentry.cocoa","version":"8.43.0"},"sent_at":"2026-04-14T13:42:02.170Z"}
+{"type":"session","length":288}
+{"errors":0,"status":"ok","started":"2026-04-14T13:42:02.169Z","did":"3A566834-BF9B-455A-8059-347B6CCA3D20","sid":"7B31FC0E-5767-4D00-8816-79BBA40346B1","init":true,"timestamp":"2026-04-14T13:42:02.169Z","attrs":{"release":"de.beyondco.herd@1.28.0+64","environment":"production"},"seq":1}

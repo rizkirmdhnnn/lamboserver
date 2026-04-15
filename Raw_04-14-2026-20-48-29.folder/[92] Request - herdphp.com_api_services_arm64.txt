@@ -1,0 +1,16 @@
+GET /api/services/arm64?all=false HTTP/1.1
+Host: herdphp.com
+baggage: sentry-environment=production,sentry-public_key=b4467e69d3bb592c90f235f9456081e2,sentry-release=de.beyondco.herd%401.28.0%2B64,sentry-trace_id=72c139f6787440d9844dd85bea2685ca
+X-Herd-License-Key: 
+X-Herd-Device-ID: E7E8C6D1-5CF7-40EE-A84F-238AF6EB382B
+sentry-trace: 72c139f6787440d9844dd85bea2685ca-342eedbf8c6346f3-0
+Accept-Language: en-ID;q=1.0, id-ID;q=0.9
+Accept-Encoding: br;q=1.0, gzip;q=0.9, deflate;q=0.8
+Accept: */*
+User-Agent: Herd/1.28.0 (de.beyondco.herd; build:64; macOS 26.4.1) Alamofire/5.10.2
+Connection: keep-alive
+X-Herd-Debug-Mode: false
+X-Herd-Version: 1.28.0
+X-OS-Version: 26.4.1
+Cookie: __cf_bm=oSSM7DIMMOYVGvgbieLRnqj04j3K88Bm.Py_1ct3MCI-1776173332-1.0.1.1-jj6H31T_fDCGvNBv7m4haoygovMLltGe29JMbaOcZejqah617O91IAkG9s698omsR2El2a4pdKaXzwA5571Fe4eW.nICDA05gTKlCmrkMv4
+

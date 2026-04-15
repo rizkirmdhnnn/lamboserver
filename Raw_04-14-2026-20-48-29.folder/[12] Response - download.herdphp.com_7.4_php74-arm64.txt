@@ -1,0 +1,21 @@
+HTTP/1.1 200 OK
+Date: Tue, 14 Apr 2026 13:28:41 GMT
+Content-Type: application/octet-stream
+Content-Length: 72498416
+Connection: keep-alive
+Accept-Ranges: bytes
+last-modified: Wed, 13 Dec 2023 21:54:33 GMT
+x-rgw-object-type: Normal
+etag: "3ba35ea267c04f0306e001239c9286da-14"
+x-amz-request-id: tx000009bd1547ca8c0ce81-0069600ec5-1846a8f59-fra1b
+vary: Origin, Access-Control-Request-Headers, Access-Control-Request-Method
+strict-transport-security: max-age=15552000; includeSubDomains; preload
+x-do-cdn-uuid: ba9d984b-740f-4cdf-a26a-57232b1fb44e
+cache-control: max-age=60
+cf-cache-status: DYNAMIC
+Server: cloudflare
+Report-To: {"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=0gUylM%2BbPD1caCCMAmAGaLBFAnsmDOjhCYYfI%2Fi%2FBhTw7nsNBXxfDSGslpKcj8gvLh71mWJ2evCjGhJR9mACSFFTtm0PqypIEXHPsSXP1BdU%2Bn%2BJDVTjo7lWj2QfEG6%2BhoHM6L06"}]}
+Nel: {"report_to":"cf-nel","success_fraction":0.0,"max_age":604800}
+CF-RAY: 9ec30e1b69dd4082-SIN
+
+<Data Binary>

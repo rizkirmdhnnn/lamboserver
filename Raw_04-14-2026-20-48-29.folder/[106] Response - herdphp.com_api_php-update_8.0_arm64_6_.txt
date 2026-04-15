@@ -1,0 +1,25 @@
+HTTP/1.1 200 OK
+Date: Tue, 14 Apr 2026 13:42:49 GMT
+Content-Type: application/json
+Transfer-Encoding: chunked
+Connection: keep-alive
+Server: cloudflare
+Nel: {"report_to":"cf-nel","success_fraction":0.0,"max_age":604800}
+Vary: Accept-Encoding
+Cache-Control: no-cache, private
+X-RateLimit-Limit: 60
+X-RateLimit-Remaining: 49
+Access-Control-Allow-Origin: *
+X-Frame-Options: SAMEORIGIN
+X-XSS-Protection: 1; mode=block
+X-Content-Type-Options: nosniff
+Content-Encoding: gzip
+cf-cache-status: DYNAMIC
+Report-To: {"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=TawqW9riWbNQ140BFFUNj6ffRKvWV3ZSeDBpX2a8VlI6TGJbc35eWoEiSbyq8WFwiyniDbQ%2FAURCWB8Rx%2FqfpgMuGiOI1bnTR0O9BgcuNUsCePbhtGdlTGN1f0TI"}]}
+CF-RAY: 9ec322ce7839406a-SIN
+
+{
+  "version": "8.0.30",
+  "internalVersion": 6,
+  "updateAvailable": false
+}

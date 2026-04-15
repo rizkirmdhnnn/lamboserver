@@ -1,0 +1,22 @@
+HTTP/1.1 200 OK
+Date: Tue, 14 Apr 2026 13:28:39 GMT
+Content-Type: application/json; charset=utf-8
+Transfer-Encoding: chunked
+Connection: keep-alive
+Server: BunnyCDN-ID1-1201
+CDN-PullZone: 1615564
+CDN-RequestCountryCode: ID
+Cache-Control: no-store,no-cache
+Content-Encoding: br
+Pragma: no-cache
+Strict-Transport-Security: max-age=2592000
+x-envoy-upstream-service-time: 0
+CDN-ProxyVer: 1.50
+CDN-RequestPullSuccess: True
+CDN-RequestPullCode: 200
+CDN-CachedAt: 04/14/2026 13:28:39
+CDN-EdgeStorageId: 1201
+CDN-RequestId: ebbe6bcd331f2ab83e8a38dc802d1db7
+CDN-RequestTime: 0
+
+{}

@@ -1,0 +1,233 @@
+HTTP/1.1 200 OK
+Date: Tue, 14 Apr 2026 13:42:02 GMT
+Content-Type: application/json
+Transfer-Encoding: chunked
+Connection: keep-alive
+Server: cloudflare
+Nel: {"report_to":"cf-nel","success_fraction":0.0,"max_age":604800}
+Vary: Accept-Encoding
+Cache-Control: no-cache, private
+X-RateLimit-Limit: 60
+X-RateLimit-Remaining: 55
+Access-Control-Allow-Origin: *
+X-Frame-Options: SAMEORIGIN
+X-XSS-Protection: 1; mode=block
+X-Content-Type-Options: nosniff
+Content-Encoding: gzip
+cf-cache-status: DYNAMIC
+Report-To: {"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=DntVc1KTWSJCQzjBuzbH0yeNlh%2FOKFYPx5HmsxMrIGQoKaJsLemzI5jb8CYc14IzSVvJyfbMjmCxgioOTJrQKcuYEyZBMgSEaEQ9Zn2SvwiF%2FUIunh%2FsmZjPi8EP"}]}
+CF-RAY: 9ec321a8ff455833-SIN
+
+[
+  {
+    "type": "mariadb",
+    "label": "MariaDB",
+    "version": "10.11.6",
+    "default_port": 3306,
+    "categories": [
+      "database"
+    ],
+    "download_path": "https://download.herdphp.com/services/mariadb/mariadb-10.11.6-arm64.zip",
+    "is_available": 1
+  },
+  {
+    "type": "meilisearch",
+    "label": "Meilisearch",
+    "version": "1.41.0",
+    "default_port": 7700,
+    "categories": [
+      "search"
+    ],
+    "download_path": "https://download.herdphp.com/services/meilisearch/1.41.0-arm64.zip",
+    "is_available": 1
+  },
+  {
+    "type": "minio",
+    "label": "MinIO",
+    "version": "RELEASE.2025-09-07",
+    "default_port": 9000,
+    "categories": [
+      "storage"
+    ],
+    "download_path": "https://download.herdphp.com/services/minio/RELEASE.2025-09-07-arm64.zip",
+    "is_available": 1
+  },
+  {
+    "type": "mongodb",
+    "label": "MongoDB",
+    "version": "7.0.31",
+    "default_port": 27020,
+    "categories": [
+      "database"
+    ],
+    "download_path": "https://download.herdphp.com/services/mongodb/7.0.31-arm64.zip",
+    "is_available": 1
+  },
+  {
+    "type": "mysql",
+    "label": "MySQL",
+    "version": "9.4.0",
+    "default_port": 3306,
+    "categories": [
+      "database"
+    ],
+    "download_path": "https://download.herdphp.com/services/mysql/9.4.0-arm64.zip",
+    "is_available": 1
+  },
+  {
+    "type": "mysql",
+    "label": "MySQL",
+    "version": "8.4.8",
+    "default_port": 3306,
+    "categories": [
+      "database"
+    ],
+    "download_path": "https://download.herdphp.com/services/mysql/8.4.8-arm64.zip",
+    "is_available": 1
+  },
+  {
+    "type": "mysql",
+    "label": "MySQL",
+    "version": "8.0.45",
+    "default_port": 3306,
+    "categories": [
+      "database"
+    ],
+    "download_path": "https://download.herdphp.com/services/mysql/8.0.45-arm64.zip",
+    "is_available": 1
+  },
+  {
+    "type": "postgresql",
+    "label": "PostgreSQL",
+    "version": "18",
+    "default_port": 5432,
+    "categories": [
+      "database"
+    ],
+    "download_path": "https://download.herdphp.com/services/postgres/18-universal.zip",
+    "is_available": 1
+  },
+  {
+    "type": "postgresql",
+    "label": "PostgreSQL",
+    "version": "17",
+    "default_port": 5432,
+    "categories": [
+      "database"
+    ],
+    "download_path": "https://download.herdphp.com/services/postgres/17-universal.zip",
+    "is_available": 1
+  },
+  {
+    "type": "postgresql",
+    "label": "PostgreSQL",
+    "version": "16",
+    "default_port": 5432,
+    "categories": [
+      "database"
+    ],
+    "download_path": "https://download.herdphp.com/services/postgres/16-universal.zip",
+    "is_available": 1
+  },
+  {
+    "type": "postgresql",
+    "label": "PostgreSQL",
+    "version": "15",
+    "default_port": 5432,
+    "categories": [
+      "database"
+    ],
+    "download_path": "https://download.herdphp.com/services/postgres/15-universal.zip",
+    "is_available": 1
+  },
+  {
+    "type": "postgresql",
+    "label": "PostgreSQL",
+    "version": "14",
+    "default_port": 5432,
+    "categories": [
+      "database"
+    ],
+    "download_path": "https://download.herdphp.com/services/postgres/14-universal.zip",
+    "is_available": 1
+  },
+  {
+    "type": "redis",
+    "label": "Redis",
+    "version": "7.4.9",
+    "default_port": 6379,
+    "categories": [
+      "queue",
+      "cache"
+    ],
+    "download_path": "https://download.herdphp.com/services/redis/7.4.9-universal.zip",
+    "is_available": 1
+  },
+  {
+    "type": "reverb",
+    "label": "Reverb",
+    "version": "1.x",
+    "default_port": 8080,
+    "categories": [
+      "realtime"
+    ],
+    "download_path": "https://download.herdphp.com/services/reverb/reverb-dashboard-2.zip",
+    "is_available": 1
+  },
+  {
+    "type": "rustfs",
+    "label": "RustFS",
+    "version": "1.0.0.89",
+    "default_port": 9000,
+    "categories": [
+      "storage"
+    ],
+    "download_path": "https://download.herdphp.com/services/rustfs/1.0.0.89-arm64.zip",
+    "is_available": 1
+  },
+  {
+    "type": "typesense",
+    "label": "Typesense",
+    "version": "30.1",
+    "default_port": 8108,
+    "categories": [
+      "search"
+    ],
+    "download_path": "https://download.herdphp.com/services/typesense/30.1-arm64.zip",
+    "is_available": 1
+  },
+  {
+    "type": "typesense",
+    "label": "Typesense",
+    "version": "29.0",
+    "default_port": 8108,
+    "categories": [
+      "search"
+    ],
+    "download_path": "https://herd-dev.fra1.digitaloceanspaces.com/services/typesense/29.0-arm64.zip",
+    "is_available": 1
+  },
+  {
+    "type": "typesense",
+    "label": "Typesense",
+    "version": "0.26",
+    "default_port": 8108,
+    "categories": [
+      "search"
+    ],
+    "download_path": "https://download.herdphp.com/services/typesense/typesense-server-26.0-arm64.zip",
+    "is_available": 1
+  },
+  {
+    "type": "valkey",
+    "label": "Valkey",
+    "version": "8.1.6",
+    "default_port": 6379,
+    "categories": [
+      "queue",
+      "cache"
+    ],
+    "download_path": "https://download.herdphp.com/services/valkey/8.1.6-universal.zip",
+    "is_available": 1
+  }
+]

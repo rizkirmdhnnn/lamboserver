@@ -1,0 +1,22 @@
+HTTP/1.1 200 OK
+Date: Tue, 14 Apr 2026 13:42:29 GMT
+Content-Type: application/octet-stream
+Content-Length: 72161920
+Connection: keep-alive
+Accept-Ranges: bytes
+last-modified: Thu, 21 Dec 2023 08:25:11 GMT
+x-rgw-object-type: Normal
+etag: "ce1a34f63376997abc1fb5947f6d48e6-14"
+x-amz-request-id: tx0000051f6b7ce716127dc-0069b48475-1a4096603-fra1b
+vary: Origin, Access-Control-Request-Headers, Access-Control-Request-Method
+strict-transport-security: max-age=15552000; includeSubDomains; preload
+x-do-cdn-uuid: ba9d984b-740f-4cdf-a26a-57232b1fb44e
+cache-control: max-age=60
+set-cookie: __cf_bm=BEsxeU2qOVmXfFzYUa07nTC6BVc15tIxqcyhsM5jHHw-1776174148.9778702-1.0.1.1-N.SMF3dUQLgvGIk1Fkr18xYEXmpENk2AiK8C.7xldptvhOJy0uivja6He3wtK5IBxJse5MGSRIJIqbisYFkvsOLmfQIWJZFzxbO2QeS5ZgE9jHq7khU0AHml8wmhXPxE; HttpOnly; Secure; Path=/; Domain=download.herdphp.com; Expires=Tue, 14 Apr 2026 14:12:29 GMT
+cf-cache-status: DYNAMIC
+Server: cloudflare
+Report-To: {"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=BncJvyWZuvSb2o8WLwOiVEqKI%2BJ%2Fflnwn%2BbOsG944QTsGVF%2FIGtqg5FTbyROZ2ePGqXphG5OF4V4Sl5PfhieWHU5HPD1s2GWPrUmMj6oCAYyNjxiRK5IzOysd5HTErjwBc0eGcZ3"}]}
+Nel: {"report_to":"cf-nel","success_fraction":0.0,"max_age":604800}
+CF-RAY: 9ec3224f0b9cce16-SIN
+
+<Data Binary>

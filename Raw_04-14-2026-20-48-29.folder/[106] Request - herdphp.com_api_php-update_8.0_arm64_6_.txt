@@ -1,0 +1,11 @@
+GET /api/php-update/8.0/arm64/6/ HTTP/1.1
+Host: herdphp.com
+Accept: */*
+Connection: keep-alive
+baggage: sentry-environment=production,sentry-public_key=b4467e69d3bb592c90f235f9456081e2,sentry-release=de.beyondco.herd%401.28.0%2B64,sentry-trace_id=72c139f6787440d9844dd85bea2685ca
+Cookie: __cf_bm=oSSM7DIMMOYVGvgbieLRnqj04j3K88Bm.Py_1ct3MCI-1776173332-1.0.1.1-jj6H31T_fDCGvNBv7m4haoygovMLltGe29JMbaOcZejqah617O91IAkG9s698omsR2El2a4pdKaXzwA5571Fe4eW.nICDA05gTKlCmrkMv4
+Accept-Language: en-GB,en-US;q=0.9,en;q=0.8
+User-Agent: Herd/64 CFNetwork/3860.500.112 Darwin/25.4.0
+Accept-Encoding: gzip, deflate, br
+sentry-trace: 72c139f6787440d9844dd85bea2685ca-342eedbf8c6346f3-0
+

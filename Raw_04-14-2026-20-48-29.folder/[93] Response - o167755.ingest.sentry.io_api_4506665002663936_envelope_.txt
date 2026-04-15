@@ -1,0 +1,14 @@
+HTTP/1.1 200 OK
+server: nginx
+date: Tue, 14 Apr 2026 13:42:02 GMT
+content-type: application/json
+Content-Length: 2
+vary: origin, access-control-request-method, access-control-request-headers
+access-control-allow-origin: *
+access-control-expose-headers: x-sentry-error,x-sentry-rate-limits,retry-after
+cross-origin-resource-policy: cross-origin
+strict-transport-security: max-age=31536000; includeSubDomains; preload
+via: 1.1 google
+Alt-Svc: h3=":443"; ma=2592000
+
+{}
