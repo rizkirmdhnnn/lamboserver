@@ -5,13 +5,17 @@ import {
   Server,
   FileCode2,
   Hexagon,
+  Database,
   ScrollText,
+  ChevronDown,
 } from "lucide-react";
 import Dashboard from "./pages/Dashboard";
 import SitesPage from "./pages/SitesPage";
 import ServicesPage from "./pages/ServicesPage";
 import PhpPage from "./pages/PhpPage";
 import NodePage from "./pages/NodePage";
+import DatabasePage from "./pages/DatabasePage";
+import PgDatabasePage from "./pages/PgDatabasePage";
 import LogsPage from "./pages/LogsPage";
 
 const navItems = [
@@ -25,6 +29,7 @@ const navItems = [
 
 function App() {
   const [activePage, setActivePage] = useState("dashboard");
+  const [dbOpen, setDbOpen] = useState(false);
 
   const renderPage = () => {
     switch (activePage) {
@@ -38,6 +43,10 @@ function App() {
         return <PhpPage />;
       case "node":
         return <NodePage />;
+      case "database":
+        return <DatabasePage />;
+      case "pg-database":
+        return <PgDatabasePage />;
       case "logs":
         return <LogsPage />;
       default:
@@ -55,7 +64,53 @@ function App() {
             <span>Local Dev Environment</span>
           </div>
           <nav className="sidebar-nav">
-            {navItems.map((item) => (
+            {navItems.filter(item => ["dashboard", "sites", "services", "php", "node"].includes(item.id)).map((item) => (
+              <button
+                key={item.id}
+                className={`nav-item ${activePage === item.id ? "active" : ""}`}
+                onClick={() => setActivePage(item.id)}
+              >
+                <item.icon />
+                {item.label}
+              </button>
+            ))}
+
+            {/* Database dropdown — parent toggles only, does not navigate (per D-02) */}
+            <div>
+              <button
+                className={`nav-item ${(activePage === "database" || activePage === "pg-database") ? "active" : ""}`}
+                onClick={() => setDbOpen(!dbOpen)}
+              >
+                <Database />
+                Database
+                <ChevronDown
+                  size={14}
+                  style={{
+                    marginLeft: "auto",
+                    transform: dbOpen ? "rotate(180deg)" : "rotate(0deg)",
+                    transition: "transform 0.15s",
+                  }}
+                />
+              </button>
+              {dbOpen && (
+                <div style={{ paddingLeft: 16 }}>
+                  <button
+                    className={`nav-item ${activePage === "database" ? "active" : ""}`}
+                    onClick={() => setActivePage("database")}
+                  >
+                    MySQL
+                  </button>
+                  <button
+                    className={`nav-item ${activePage === "pg-database" ? "active" : ""}`}
+                    onClick={() => setActivePage("pg-database")}
+                  >
+                    PostgreSQL
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {navItems.filter(item => item.id === "logs").map((item) => (
               <button
                 key={item.id}
                 className={`nav-item ${activePage === item.id ? "active" : ""}`}

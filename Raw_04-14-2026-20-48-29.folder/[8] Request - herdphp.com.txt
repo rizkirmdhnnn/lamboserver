@@ -1,5 +1,0 @@
-CONNECT herdphp.com:443 HTTP/1.1
-Host: herdphp.com
-Proxy-Connection: keep-alive
-Connection: keep-alive
-

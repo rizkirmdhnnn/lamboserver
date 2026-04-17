@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 import { FileCode2, Download, Check } from "lucide-react";
 import {
+  InstallVersion,
+  SwitchVersion,
+  UninstallVersion,
   GetPhpVersions,
   GetAvailablePhpVersions,
-  InstallPhp,
-  SetActivePhp,
-  UninstallPhp,
 } from "../../wailsjs/go/main/App";
 import VersionList from "../components/VersionList";
 
@@ -59,7 +59,7 @@ function PhpPage() {
   const handleInstall = async (version: string) => {
     setInstalling(version);
     try {
-      await InstallPhp(version);
+      await InstallVersion("php", version);
       await loadVersions();
       const data = await GetAvailablePhpVersions();
       setAvailable(data || []);
@@ -71,7 +71,7 @@ function PhpPage() {
 
   const handleSetActive = async (version: string) => {
     try {
-      await SetActivePhp(version);
+      await SwitchVersion("php", version);
       await loadVersions();
     } catch (e) {
       console.error(e);
@@ -80,7 +80,7 @@ function PhpPage() {
 
   const handleUninstall = async (version: string) => {
     try {
-      await UninstallPhp(version);
+      await UninstallVersion("php", version);
       await loadVersions();
     } catch (e) {
       console.error(e);

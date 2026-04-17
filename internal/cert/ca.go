@@ -9,25 +9,39 @@ import (
 	"fmt"
 	"math/big"
 	"os"
+	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/rizkirmdhnnn/lamboserver/internal/system"
 )
 
+// Manager handles local CA creation, keychain trust, and per-site TLS certificate
+// generation. All cryptographic operations use the standard library (crypto/rsa,
+// crypto/x509); no external CA tooling is required.
 type Manager struct {
 	paths *system.Paths
+	fs    FileSystem
+	admin AdminRunner
 }
 
-func NewManager(paths *system.Paths) *Manager {
-	return &Manager{paths: paths}
+// NewManager creates a Manager with injected filesystem and admin-runner dependencies.
+// paths provides the CA and certificate file locations under ~/.lamboserver/certs/.
+func NewManager(paths *system.Paths, fs FileSystem, admin AdminRunner) *Manager {
+	return &Manager{paths: paths, fs: fs, admin: admin}
 }
 
+// IsCAInstalled reports whether both the CA certificate and CA private key files exist
+// at the paths returned by paths.CACert() and paths.CAKey().
 func (m *Manager) IsCAInstalled() bool {
-	_, err1 := os.Stat(m.paths.CACert())
-	_, err2 := os.Stat(m.paths.CAKey())
+	_, err1 := m.fs.Stat(m.paths.CACert())
+	_, err2 := m.fs.Stat(m.paths.CAKey())
 	return err1 == nil && err2 == nil
 }
 
+// SetupCA generates a new local Certificate Authority: a 4096-bit RSA private key and
+// a self-signed CA certificate valid for 10 years. Both files are written to
+// ~/.lamboserver/certs/. If the CA is already installed, SetupCA is a no-op.
 func (m *Manager) SetupCA() error {
 	if m.IsCAInstalled() {
 		return nil
@@ -61,54 +75,71 @@ func (m *Manager) SetupCA() error {
 	}
 
 	// Write CA cert
-	certFile, err := os.Create(m.paths.CACert())
+	certFile, err := m.fs.Create(m.paths.CACert())
 	if err != nil {
 		return err
 	}
 	defer certFile.Close()
-	pem.Encode(certFile, &pem.Block{Type: "CERTIFICATE", Bytes: caBytes})
+	pem.Encode(certFile, &pem.Block{Type: "CERTIFICATE", Bytes: caBytes}) // error intentionally ignored: pem.Encode to file rarely fails
 
 	// Write CA key
-	keyFile, err := os.OpenFile(m.paths.CAKey(), os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
+	keyFile, err := m.fs.OpenFile(m.paths.CAKey(), os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
 	if err != nil {
 		return err
 	}
 	defer keyFile.Close()
-	pem.Encode(keyFile, &pem.Block{Type: "RSA PRIVATE KEY", Bytes: x509.MarshalPKCS1PrivateKey(caKey)})
+	pem.Encode(keyFile, &pem.Block{Type: "RSA PRIVATE KEY", Bytes: x509.MarshalPKCS1PrivateKey(caKey)}) // error intentionally ignored: pem.Encode to file rarely fails
 
 	return nil
 }
 
+// TrustCA adds the local CA certificate to the macOS System keychain as a trusted root
+// using the `security` CLI via AdminRunner (requires admin privileges). Returns an error
+// if the CA is not yet installed.
 func (m *Manager) TrustCA() error {
 	if !m.IsCAInstalled() {
 		return fmt.Errorf("CA not installed, run SetupCA first")
 	}
 
-	cmd := fmt.Sprintf("security add-trusted-cert -d -r trustRoot -k /Library/Keychains/System.keychain %s", m.paths.CACert())
-	return system.RunWithAdminPrivileges(cmd)
+	caPath := filepath.Clean(m.paths.CACert())
+	if strings.ContainsAny(caPath, ";&|`$><\\\"'\n\r\t") {
+		return fmt.Errorf("invalid CA certificate path: %q", caPath)
+	}
+	cmd := fmt.Sprintf("security add-trusted-cert -d -r trustRoot -k /Library/Keychains/System.keychain '%s'", caPath)
+	return m.admin.RunWithPrivileges(cmd)
 }
 
+// GenerateCert generates a 2048-bit RSA TLS certificate for the given domain, signed
+// by the local CA. The certificate is valid for 2 years with SAN for the exact domain.
+// Returns the paths to the certificate and private key files, or an error if the CA
+// is not installed or cryptographic operations fail.
 func (m *Manager) GenerateCert(domain string) (string, string, error) {
 	certPath := m.paths.SiteCert(domain)
 	keyPath := m.paths.SiteKey(domain)
 
 	// Load CA
-	caCertPEM, err := os.ReadFile(m.paths.CACert())
+	caCertPEM, err := m.fs.ReadFile(m.paths.CACert())
 	if err != nil {
 		return "", "", fmt.Errorf("failed to read CA cert: %w", err)
 	}
-	caKeyPEM, err := os.ReadFile(m.paths.CAKey())
+	caKeyPEM, err := m.fs.ReadFile(m.paths.CAKey())
 	if err != nil {
 		return "", "", fmt.Errorf("failed to read CA key: %w", err)
 	}
 
 	caCertBlock, _ := pem.Decode(caCertPEM)
+	if caCertBlock == nil {
+		return "", "", ErrCorruptedCA
+	}
 	caCert, err := x509.ParseCertificate(caCertBlock.Bytes)
 	if err != nil {
 		return "", "", fmt.Errorf("failed to parse CA cert: %w", err)
 	}
 
 	caKeyBlock, _ := pem.Decode(caKeyPEM)
+	if caKeyBlock == nil {
+		return "", "", ErrCorruptedCA
+	}
 	caKey, err := x509.ParsePKCS1PrivateKey(caKeyBlock.Bytes)
 	if err != nil {
 		return "", "", fmt.Errorf("failed to parse CA key: %w", err)
@@ -141,26 +172,28 @@ func (m *Manager) GenerateCert(domain string) (string, string, error) {
 	}
 
 	// Write site cert
-	cf, err := os.Create(certPath)
+	cf, err := m.fs.Create(certPath)
 	if err != nil {
 		return "", "", err
 	}
 	defer cf.Close()
-	pem.Encode(cf, &pem.Block{Type: "CERTIFICATE", Bytes: siteBytes})
+	pem.Encode(cf, &pem.Block{Type: "CERTIFICATE", Bytes: siteBytes}) // error intentionally ignored: pem.Encode to file rarely fails
 
 	// Write site key
-	kf, err := os.OpenFile(keyPath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
+	kf, err := m.fs.OpenFile(keyPath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
 	if err != nil {
 		return "", "", err
 	}
 	defer kf.Close()
-	pem.Encode(kf, &pem.Block{Type: "RSA PRIVATE KEY", Bytes: x509.MarshalPKCS1PrivateKey(siteKey)})
+	pem.Encode(kf, &pem.Block{Type: "RSA PRIVATE KEY", Bytes: x509.MarshalPKCS1PrivateKey(siteKey)}) // error intentionally ignored: pem.Encode to file rarely fails
 
 	return certPath, keyPath, nil
 }
 
+// RemoveCert deletes the certificate and key files for the given domain from
+// ~/.lamboserver/certs/. Filesystem errors are intentionally ignored during cleanup.
 func (m *Manager) RemoveCert(domain string) error {
-	os.Remove(m.paths.SiteCert(domain))
-	os.Remove(m.paths.SiteKey(domain))
+	m.fs.Remove(m.paths.SiteCert(domain)) // error intentionally ignored on cleanup
+	m.fs.Remove(m.paths.SiteKey(domain))  // error intentionally ignored on cleanup
 	return nil
 }

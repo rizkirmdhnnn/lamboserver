@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
-import { Globe, FileCode2, Hexagon, Server, Bug } from "lucide-react";
+import { Globe, FileCode2, Hexagon, Server, Bug, Database } from "lucide-react";
 import { GetDashboardStatus, EnableDebug, DisableDebug } from "../../wailsjs/go/main/App";
 
 interface DashboardData {
   nginx_status: { installed: boolean; running: boolean };
   dns_status: { installed: boolean; running: boolean; resolver: boolean };
+  mysql_status: { installed: boolean; running: boolean; port: number };
+  postgresql_status: { installed: boolean; running: boolean; port: number };
   php_versions: number;
   node_versions: number;
   sites_count: number;
@@ -12,6 +14,7 @@ interface DashboardData {
   active_node: string;
   first_run: boolean;
   debug_mode: boolean;
+  shell_integrated: boolean;
 }
 
 function Dashboard() {
@@ -102,6 +105,54 @@ function Dashboard() {
             </div>
             <span style={{ fontSize: 12, color: "var(--text-muted)" }}>
               {status?.dns_status?.running ? "Running" : "Stopped"}
+            </span>
+          </div>
+          <div className="service-row">
+            <div className="service-info">
+              <span
+                className={`status-dot ${
+                  !status?.mysql_status?.installed
+                    ? "stopped"
+                    : status?.mysql_status?.running
+                    ? "running"
+                    : "stopped"
+                }`}
+              />
+              <div>
+                <div className="service-name">MySQL</div>
+                <div className="service-detail">Database server</div>
+              </div>
+            </div>
+            <span style={{ fontSize: 12, color: "var(--text-muted)" }}>
+              {!status?.mysql_status?.installed
+                ? "Not Installed"
+                : status?.mysql_status?.running
+                ? "Running"
+                : "Stopped"}
+            </span>
+          </div>
+          <div className="service-row">
+            <div className="service-info">
+              <span
+                className={`status-dot ${
+                  !status?.postgresql_status?.installed
+                    ? "stopped"
+                    : status?.postgresql_status?.running
+                    ? "running"
+                    : "stopped"
+                }`}
+              />
+              <div>
+                <div className="service-name">PostgreSQL</div>
+                <div className="service-detail">Database server</div>
+              </div>
+            </div>
+            <span style={{ fontSize: 12, color: "var(--text-muted)" }}>
+              {!status?.postgresql_status?.installed
+                ? "Not Installed"
+                : status?.postgresql_status?.running
+                ? "Running"
+                : "Stopped"}
             </span>
           </div>
         </div>

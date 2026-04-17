@@ -6,12 +6,32 @@ export function ClearDebugLog() {
   return window['go']['main']['App']['ClearDebugLog']();
 }
 
+export function CreateServiceDatabase(arg1, arg2) {
+  return window['go']['main']['App']['CreateServiceDatabase'](arg1, arg2);
+}
+
+export function CreateSite(arg1, arg2, arg3) {
+  return window['go']['main']['App']['CreateSite'](arg1, arg2, arg3);
+}
+
+export function DeleteSite(arg1) {
+  return window['go']['main']['App']['DeleteSite'](arg1);
+}
+
 export function DisableDebug() {
   return window['go']['main']['App']['DisableDebug']();
 }
 
+export function DropServiceDatabase(arg1, arg2) {
+  return window['go']['main']['App']['DropServiceDatabase'](arg1, arg2);
+}
+
 export function EnableDebug() {
   return window['go']['main']['App']['EnableDebug']();
+}
+
+export function GetAllStatuses() {
+  return window['go']['main']['App']['GetAllStatuses']();
 }
 
 export function GetAvailableNodeVersions() {
@@ -22,6 +42,14 @@ export function GetAvailablePhpVersions() {
   return window['go']['main']['App']['GetAvailablePhpVersions']();
 }
 
+export function GetAvailableVersions(arg1) {
+  return window['go']['main']['App']['GetAvailableVersions'](arg1);
+}
+
+export function GetConfig() {
+  return window['go']['main']['App']['GetConfig']();
+}
+
 export function GetDashboardStatus() {
   return window['go']['main']['App']['GetDashboardStatus']();
 }
@@ -30,44 +58,56 @@ export function GetDebugLogPath() {
   return window['go']['main']['App']['GetDebugLogPath']();
 }
 
-export function GetDnsStatus() {
-  return window['go']['main']['App']['GetDnsStatus']();
+export function GetInstalledVersions(arg1) {
+  return window['go']['main']['App']['GetInstalledVersions'](arg1);
 }
 
 export function GetLogFiles() {
   return window['go']['main']['App']['GetLogFiles']();
 }
 
-export function GetNginxStatus() {
-  return window['go']['main']['App']['GetNginxStatus']();
-}
-
 export function GetNodeVersions() {
   return window['go']['main']['App']['GetNodeVersions']();
 }
 
-export function GetPhpFpmStatus() {
-  return window['go']['main']['App']['GetPhpFpmStatus']();
+export function GetPgwebStatus() {
+  return window['go']['main']['App']['GetPgwebStatus']();
 }
 
 export function GetPhpVersions() {
   return window['go']['main']['App']['GetPhpVersions']();
 }
 
+export function GetServiceLogs(arg1, arg2) {
+  return window['go']['main']['App']['GetServiceLogs'](arg1, arg2);
+}
+
 export function GetSites() {
   return window['go']['main']['App']['GetSites']();
 }
 
-export function InstallNode(arg1) {
-  return window['go']['main']['App']['InstallNode'](arg1);
+export function GetWebAdminURL(arg1) {
+  return window['go']['main']['App']['GetWebAdminURL'](arg1);
 }
 
-export function InstallPhp(arg1) {
-  return window['go']['main']['App']['InstallPhp'](arg1);
+export function InitService(arg1) {
+  return window['go']['main']['App']['InitService'](arg1);
+}
+
+export function InstallPgweb() {
+  return window['go']['main']['App']['InstallPgweb']();
 }
 
 export function InstallShellIntegration() {
   return window['go']['main']['App']['InstallShellIntegration']();
+}
+
+export function InstallVersion(arg1, arg2) {
+  return window['go']['main']['App']['InstallVersion'](arg1, arg2);
+}
+
+export function InstallWebAdmin(arg1, arg2) {
+  return window['go']['main']['App']['InstallWebAdmin'](arg1, arg2);
 }
 
 export function IsCAInstalled() {
@@ -82,70 +122,66 @@ export function IsShellIntegrated() {
   return window['go']['main']['App']['IsShellIntegrated']();
 }
 
-export function LinkSite(arg1, arg2) {
-  return window['go']['main']['App']['LinkSite'](arg1, arg2);
+export function ListServiceDatabases(arg1) {
+  return window['go']['main']['App']['ListServiceDatabases'](arg1);
+}
+
+export function OpenPgweb() {
+  return window['go']['main']['App']['OpenPgweb']();
+}
+
+export function OpenWebAdmin(arg1) {
+  return window['go']['main']['App']['OpenWebAdmin'](arg1);
 }
 
 export function ReadLog(arg1, arg2) {
   return window['go']['main']['App']['ReadLog'](arg1, arg2);
 }
 
-export function ReloadNginx() {
-  return window['go']['main']['App']['ReloadNginx']();
+export function RestartService(arg1) {
+  return window['go']['main']['App']['RestartService'](arg1);
+}
+
+export function SaveConfig(arg1) {
+  return window['go']['main']['App']['SaveConfig'](arg1);
 }
 
 export function SelectDirectory() {
   return window['go']['main']['App']['SelectDirectory']();
 }
 
-export function SetActiveNode(arg1) {
-  return window['go']['main']['App']['SetActiveNode'](arg1);
-}
-
-export function SetActivePhp(arg1) {
-  return window['go']['main']['App']['SetActivePhp'](arg1);
-}
-
 export function SetupCA() {
   return window['go']['main']['App']['SetupCA']();
 }
 
-export function StartDns() {
-  return window['go']['main']['App']['StartDns']();
+export function StartPgweb() {
+  return window['go']['main']['App']['StartPgweb']();
 }
 
-export function StartNginx() {
-  return window['go']['main']['App']['StartNginx']();
+export function StartService(arg1) {
+  return window['go']['main']['App']['StartService'](arg1);
 }
 
-export function StartPhpFpm() {
-  return window['go']['main']['App']['StartPhpFpm']();
+export function StopPgweb() {
+  return window['go']['main']['App']['StopPgweb']();
 }
 
-export function StopDns() {
-  return window['go']['main']['App']['StopDns']();
+export function StopService(arg1) {
+  return window['go']['main']['App']['StopService'](arg1);
 }
 
-export function StopNginx() {
-  return window['go']['main']['App']['StopNginx']();
-}
-
-export function StopPhpFpm() {
-  return window['go']['main']['App']['StopPhpFpm']();
-}
-
-export function UninstallNode(arg1) {
-  return window['go']['main']['App']['UninstallNode'](arg1);
-}
-
-export function UninstallPhp(arg1) {
-  return window['go']['main']['App']['UninstallPhp'](arg1);
+export function SwitchVersion(arg1, arg2) {
+  return window['go']['main']['App']['SwitchVersion'](arg1, arg2);
 }
 
 export function UninstallShellIntegration() {
   return window['go']['main']['App']['UninstallShellIntegration']();
 }
 
-export function UnlinkSite(arg1) {
-  return window['go']['main']['App']['UnlinkSite'](arg1);
+export function UninstallVersion(arg1, arg2) {
+  return window['go']['main']['App']['UninstallVersion'](arg1, arg2);
+}
+
+export function UninstallWebAdmin(arg1) {
+  return window['go']['main']['App']['UninstallWebAdmin'](arg1);
 }

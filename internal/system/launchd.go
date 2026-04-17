@@ -8,6 +8,7 @@ import (
 	"text/template"
 )
 
+// ServiceType distinguishes between system-level daemons and user-level agents.
 type ServiceType int
 
 const (
@@ -15,6 +16,7 @@ const (
 	ServiceAgent                     // ~/Library/LaunchAgents (user)
 )
 
+// ServiceConfig holds all parameters needed to generate and install a launchd plist.
 type ServiceConfig struct {
 	Label                string
 	Program              string
@@ -24,6 +26,7 @@ type ServiceConfig struct {
 	WorkingDir           string
 	StdoutPath           string
 	StderrPath           string
+	UserName             string // optional; defaults to "root" for daemons if empty
 	Type                 ServiceType
 	EnvironmentVariables map[string]string
 }
@@ -33,6 +36,7 @@ func (c ServiceConfig) IsDaemon() bool {
 	return c.Type == ServiceDaemon
 }
 
+// ServiceStatus reports the current running state of a launchd service.
 type ServiceStatus struct {
 	Label   string `json:"label"`
 	Running bool   `json:"running"`
@@ -47,7 +51,7 @@ const plistTemplate = `<?xml version="1.0" encoding="UTF-8"?>
 	<string>{{.Label}}</string>
 {{- if .IsDaemon}}
 	<key>UserName</key>
-	<string>root</string>
+	<string>{{if .UserName}}{{.UserName}}{{else}}root{{end}}</string>
 {{- end}}
 	<key>ProgramArguments</key>
 	<array>
@@ -84,11 +88,15 @@ const plistTemplate = `<?xml version="1.0" encoding="UTF-8"?>
 </dict>
 </plist>`
 
+// LaunchdManager installs, uninstalls, and controls macOS launchd services
+// (both system-level LaunchDaemons and user-level LaunchAgents). It delegates
+// privileged daemon operations to the Helper to avoid repeated password prompts.
 type LaunchdManager struct {
 	paths  *Paths
 	helper *Helper
 }
 
+// NewLaunchdManager creates a LaunchdManager with the given path configuration.
 func NewLaunchdManager(paths *Paths) *LaunchdManager {
 	return &LaunchdManager{
 		paths:  paths,
@@ -108,6 +116,9 @@ func (m *LaunchdManager) plistPath(cfg ServiceConfig) string {
 	return filepath.Join(m.paths.LaunchAgentsDir(), cfg.Label+".plist")
 }
 
+// Install generates a plist from cfg, writes it to the appropriate launchd directory,
+// and loads the service. Daemons are installed via the privileged helper; agents are
+// installed directly without admin privileges.
 func (m *LaunchdManager) Install(cfg ServiceConfig) error {
 	tmpl, err := template.New("plist").Parse(plistTemplate)
 	if err != nil {
@@ -141,6 +152,8 @@ func (m *LaunchdManager) Install(cfg ServiceConfig) error {
 	return err
 }
 
+// Uninstall unloads and removes the plist for the given service configuration.
+// Daemons are uninstalled via the privileged helper; agents are removed directly.
 func (m *LaunchdManager) Uninstall(cfg ServiceConfig) error {
 	if cfg.Type == ServiceDaemon {
 		_, err := m.helper.Run("uninstall-daemon", cfg.Label)
@@ -152,16 +165,21 @@ func (m *LaunchdManager) Uninstall(cfg ServiceConfig) error {
 	return os.Remove(plistPath)
 }
 
+// Start sends a start signal to the launchd service identified by label.
 func (m *LaunchdManager) Start(label string) error {
 	_, err := RunCommand("launchctl", "start", label)
 	return err
 }
 
+// Stop sends a stop signal to the launchd service identified by label.
 func (m *LaunchdManager) Stop(label string) error {
 	_, err := RunCommand("launchctl", "stop", label)
 	return err
 }
 
+// IsRunning reports whether the launchd service identified by label is currently
+// running. It checks user-level agents via launchctl list and system-level daemons
+// via plist existence combined with pgrep.
 func (m *LaunchdManager) IsRunning(label string) bool {
 	// Check user-level agents
 	output, err := RunCommand("launchctl", "list")
@@ -188,6 +206,7 @@ func (m *LaunchdManager) IsRunning(label string) bool {
 	return false
 }
 
+// GetStatus returns the current ServiceStatus for the launchd service identified by label.
 func (m *LaunchdManager) GetStatus(label string) ServiceStatus {
 	return ServiceStatus{
 		Label:   label,

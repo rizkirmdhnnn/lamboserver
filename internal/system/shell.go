@@ -15,12 +15,22 @@ const shellBlock = `
 export PATH="$HOME/.lamboserver/bin:$PATH"
 `
 
+// Integration manages PATH injection into the user's shell rc files and maintains
+// symlinks in ~/.lamboserver/bin/ for active PHP and Node.js binaries.
 type Integration struct {
-	paths *Paths
+	paths   *Paths
+	homeDir string
 }
 
+// NewIntegration creates a new Integration with the given path configuration.
 func NewIntegration(paths *Paths) *Integration {
 	return &Integration{paths: paths}
+}
+
+// WithHome returns a copy of the Integration with a custom home directory.
+// Used in tests to redirect shell rc file operations to a temp directory.
+func (s *Integration) WithHome(home string) *Integration {
+	return &Integration{paths: s.paths, homeDir: home}
 }
 
 // IsInstalled checks if PATH injection exists in any shell rc file
@@ -40,7 +50,8 @@ func (s *Integration) Install() error {
 
 	for _, rc := range rcFiles {
 		if s.fileContains(rc, shellMarker) {
-			continue // already installed
+			installed = true // already installed in this file
+			continue
 		}
 
 		// Only install in files that exist, plus always ensure .zshrc (macOS default)
@@ -59,7 +70,10 @@ func (s *Integration) Install() error {
 
 	if !installed {
 		// Fallback: create .zshrc with the block
-		home, _ := os.UserHomeDir()
+		home := s.homeDir
+		if home == "" {
+			home, _ = os.UserHomeDir()
+		}
 		zshrc := filepath.Join(home, ".zshrc")
 		return s.appendToFile(zshrc, shellBlock)
 	}
@@ -147,7 +161,10 @@ func (s *Integration) LinkNodeBinaries(nodeBasePath string) error {
 }
 
 func (s *Integration) shellRCFiles() []string {
-	home, _ := os.UserHomeDir()
+	home := s.homeDir
+	if home == "" {
+		home, _ = os.UserHomeDir()
+	}
 	return []string{
 		filepath.Join(home, ".zshrc"),
 		filepath.Join(home, ".bashrc"),

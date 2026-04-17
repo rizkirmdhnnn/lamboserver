@@ -9,5 +9,12 @@
   "author": {
     "name": "Achmad Rizki Ramadhan",
     "email": "achmadrizkiramadhan0101@gmail.com"
+  },
+  "info": {
+    "companyName": "LamboServer",
+    "productName": "LamboServer",
+    "productVersion": "1.0.0",
+    "copyright": "\u00a9 2026 LamboServer",
+    "comments": "Local web development environment manager for macOS"
   }
 }

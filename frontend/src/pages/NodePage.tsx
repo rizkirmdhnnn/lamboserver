@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 import { Hexagon, Download } from "lucide-react";
 import {
+  InstallVersion,
+  SwitchVersion,
+  UninstallVersion,
   GetNodeVersions,
   GetAvailableNodeVersions,
-  InstallNode,
-  SetActiveNode,
-  UninstallNode,
 } from "../../wailsjs/go/main/App";
 import VersionList from "../components/VersionList";
 
@@ -51,7 +51,7 @@ function NodePage() {
   const handleInstall = async (version: string) => {
     setInstalling(version);
     try {
-      await InstallNode(version);
+      await InstallVersion("nodejs", version);
       await loadInstalled();
     } catch (e) {
       console.error(e);
@@ -61,7 +61,7 @@ function NodePage() {
 
   const handleSetActive = async (version: string) => {
     try {
-      await SetActiveNode(version);
+      await SwitchVersion("nodejs", version);
       await loadInstalled();
     } catch (e) {
       console.error(e);
@@ -70,7 +70,7 @@ function NodePage() {
 
   const handleUninstall = async (version: string) => {
     try {
-      await UninstallNode(version);
+      await UninstallVersion("nodejs", version);
       await loadInstalled();
     } catch (e) {
       console.error(e);

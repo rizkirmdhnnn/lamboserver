@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Globe, Trash2, Plus, FolderOpen } from "lucide-react";
-import { GetSites, LinkSite, UnlinkSite, SelectDirectory } from "../../wailsjs/go/main/App";
+import { GetSites, CreateSite, DeleteSite, SelectDirectory } from "../../wailsjs/go/main/App";
 
 interface Site {
   domain: string;
@@ -34,7 +34,7 @@ function SitesPage() {
     if (!newPath || !newDomain) return;
     setLoading(true);
     try {
-      await LinkSite(newPath, newDomain);
+      await CreateSite(newDomain, newPath, "");
       await loadSites();
       setShowForm(false);
       setNewDomain("");
@@ -47,7 +47,7 @@ function SitesPage() {
 
   const handleUnlink = async (domain: string) => {
     try {
-      await UnlinkSite(domain);
+      await DeleteSite(domain);
       await loadSites();
     } catch (e) {
       console.error(e);

@@ -7,6 +7,7 @@ import (
 	"time"
 )
 
+// SiteConfig holds the configuration for a single virtual host site.
 type SiteConfig struct {
 	Domain     string `json:"domain"`
 	Path       string `json:"path"`
@@ -15,6 +16,9 @@ type SiteConfig struct {
 	CreatedAt  string `json:"created_at"`
 }
 
+// AppConfig is the top-level application configuration persisted to
+// ~/.lamboserver/config.json. It tracks active runtime versions, site
+// mappings, Nginx ports, and debug mode.
 type AppConfig struct {
 	ActivePhpVersion  string       `json:"active_php_version"`
 	ActiveNodeVersion string       `json:"active_node_version"`
@@ -23,14 +27,22 @@ type AppConfig struct {
 	NginxPort         int          `json:"nginx_port"`
 	NginxSSLPort      int          `json:"nginx_ssl_port"`
 	DebugMode         bool         `json:"debug_mode"`
+	MySQLEnabled      bool         `json:"mysql_enabled"`
+	PostgreSQLEnabled bool         `json:"postgresql_enabled"`
 }
 
+// Store provides thread-safe, persistent storage for AppConfig. It caches the
+// configuration in memory (protected by sync.RWMutex) and writes changes to the
+// JSON file atomically. Get reads from the in-memory cache without file I/O;
+// all mutating methods acquire a write lock before modifying and persisting.
 type Store struct {
 	mu       sync.RWMutex
 	config   AppConfig
 	filePath string
 }
 
+// NewStore creates a Store backed by the given file path, loading any existing
+// configuration from disk. If the file does not exist, a default config is written.
 func NewStore(filePath string) *Store {
 	s := &Store{
 		filePath: filePath,
@@ -44,6 +56,8 @@ func NewStore(filePath string) *Store {
 	return s
 }
 
+// Load reads the configuration from disk into memory. If the file does not
+// exist, it creates the file with the current (default) configuration.
 func (s *Store) Load() error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -58,6 +72,7 @@ func (s *Store) Load() error {
 	return json.Unmarshal(data, &s.config)
 }
 
+// Save persists the current in-memory configuration to disk.
 func (s *Store) Save() error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -72,12 +87,14 @@ func (s *Store) saveLocked() error {
 	return os.WriteFile(s.filePath, data, 0644)
 }
 
+// Get returns the current in-memory AppConfig without file I/O. Safe for concurrent use.
 func (s *Store) Get() AppConfig {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 	return s.config
 }
 
+// SetActivePhpVersion updates the active PHP version in config and persists the change.
 func (s *Store) SetActivePhpVersion(version string) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -85,6 +102,7 @@ func (s *Store) SetActivePhpVersion(version string) error {
 	return s.saveLocked()
 }
 
+// SetActiveNodeVersion updates the active Node.js version in config and persists the change.
 func (s *Store) SetActiveNodeVersion(version string) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -92,6 +110,8 @@ func (s *Store) SetActiveNodeVersion(version string) error {
 	return s.saveLocked()
 }
 
+// AddSite appends a new site entry for the given domain and path. If the domain
+// already exists in the config, the operation is a no-op.
 func (s *Store) AddSite(domain, path string) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -111,6 +131,7 @@ func (s *Store) AddSite(domain, path string) error {
 	return s.saveLocked()
 }
 
+// RemoveSite removes the site entry for the given domain and persists the change.
 func (s *Store) RemoveSite(domain string) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -125,6 +146,7 @@ func (s *Store) RemoveSite(domain string) error {
 	return s.saveLocked()
 }
 
+// GetSites returns a copy of the current site list. Safe for concurrent use.
 func (s *Store) GetSites() []SiteConfig {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
@@ -133,6 +155,7 @@ func (s *Store) GetSites() []SiteConfig {
 	return result
 }
 
+// SetFirstRunComplete marks the initial setup as done and persists the change.
 func (s *Store) SetFirstRunComplete() error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -140,9 +163,26 @@ func (s *Store) SetFirstRunComplete() error {
 	return s.saveLocked()
 }
 
+// SetDebugMode enables or disables debug logging in config and persists the change.
 func (s *Store) SetDebugMode(enabled bool) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	s.config.DebugMode = enabled
+	return s.saveLocked()
+}
+
+// SetMySQLEnabled enables or disables MySQL auto-start in config and persists the change.
+func (s *Store) SetMySQLEnabled(enabled bool) error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	s.config.MySQLEnabled = enabled
+	return s.saveLocked()
+}
+
+// SetPostgreSQLEnabled enables or disables PostgreSQL auto-start in config and persists the change.
+func (s *Store) SetPostgreSQLEnabled(enabled bool) error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	s.config.PostgreSQLEnabled = enabled
 	return s.saveLocked()
 }

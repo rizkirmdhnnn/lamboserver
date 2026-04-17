@@ -1,4 +1,75 @@
-export namespace dns {
+export namespace config {
+	
+	export class SiteConfig {
+	    domain: string;
+	    path: string;
+	    php_version?: string;
+	    ssl_enabled: boolean;
+	    created_at: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new SiteConfig(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.domain = source["domain"];
+	        this.path = source["path"];
+	        this.php_version = source["php_version"];
+	        this.ssl_enabled = source["ssl_enabled"];
+	        this.created_at = source["created_at"];
+	    }
+	}
+	export class AppConfig {
+	    active_php_version: string;
+	    active_node_version: string;
+	    sites: SiteConfig[];
+	    first_run_complete: boolean;
+	    nginx_port: number;
+	    nginx_ssl_port: number;
+	    debug_mode: boolean;
+	    mysql_enabled: boolean;
+	    postgresql_enabled: boolean;
+	
+	    static createFrom(source: any = {}) {
+	        return new AppConfig(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.active_php_version = source["active_php_version"];
+	        this.active_node_version = source["active_node_version"];
+	        this.sites = this.convertValues(source["sites"], SiteConfig);
+	        this.first_run_complete = source["first_run_complete"];
+	        this.nginx_port = source["nginx_port"];
+	        this.nginx_ssl_port = source["nginx_ssl_port"];
+	        this.debug_mode = source["debug_mode"];
+	        this.mysql_enabled = source["mysql_enabled"];
+	        this.postgresql_enabled = source["postgresql_enabled"];
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice && a.map) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
+
+}
+
+export namespace dnsmasq {
 	
 	export class ServiceStatus {
 	    installed: boolean;
@@ -19,7 +90,7 @@ export namespace dns {
 
 }
 
-export namespace log {
+export namespace logger {
 	
 	export class LogFile {
 	    name: string;
@@ -44,8 +115,10 @@ export namespace main {
 	
 	export class DashboardStatus {
 	    nginx_status: nginx.ServiceStatus;
-	    dns_status: dns.ServiceStatus;
+	    dns_status: dnsmasq.ServiceStatus;
 	    fpm_status: php.FpmStatus;
+	    mysql_status: mysql.ServiceStatus;
+	    postgresql_status: postgres.ServiceStatus;
 	    php_versions: number;
 	    node_versions: number;
 	    sites_count: number;
@@ -62,8 +135,10 @@ export namespace main {
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.nginx_status = this.convertValues(source["nginx_status"], nginx.ServiceStatus);
-	        this.dns_status = this.convertValues(source["dns_status"], dns.ServiceStatus);
+	        this.dns_status = this.convertValues(source["dns_status"], dnsmasq.ServiceStatus);
 	        this.fpm_status = this.convertValues(source["fpm_status"], php.FpmStatus);
+	        this.mysql_status = this.convertValues(source["mysql_status"], mysql.ServiceStatus);
+	        this.postgresql_status = this.convertValues(source["postgresql_status"], postgres.ServiceStatus);
 	        this.php_versions = source["php_versions"];
 	        this.node_versions = source["node_versions"];
 	        this.sites_count = source["sites_count"];
@@ -92,6 +167,57 @@ export namespace main {
 		    return a;
 		}
 	}
+	export class DatabaseEntry {
+	    name: string;
+	    size?: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new DatabaseEntry(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.name = source["name"];
+	        this.size = source["size"];
+	    }
+	}
+	export class PgwebStatus {
+	    installed: boolean;
+	    running: boolean;
+	    port: number;
+	
+	    static createFrom(source: any = {}) {
+	        return new PgwebStatus(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.installed = source["installed"];
+	        this.running = source["running"];
+	        this.port = source["port"];
+	    }
+	}
+
+}
+
+export namespace mysql {
+	
+	export class ServiceStatus {
+	    installed: boolean;
+	    running: boolean;
+	    port: number;
+	
+	    static createFrom(source: any = {}) {
+	        return new ServiceStatus(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.installed = source["installed"];
+	        this.running = source["running"];
+	        this.port = source["port"];
+	    }
+	}
 
 }
 
@@ -114,7 +240,7 @@ export namespace nginx {
 
 }
 
-export namespace node {
+export namespace nodejs {
 	
 	export class NodeVersion {
 	    version: string;
@@ -196,7 +322,28 @@ export namespace php {
 
 }
 
-export namespace site {
+export namespace postgres {
+	
+	export class ServiceStatus {
+	    installed: boolean;
+	    running: boolean;
+	    port: number;
+	
+	    static createFrom(source: any = {}) {
+	        return new ServiceStatus(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.installed = source["installed"];
+	        this.running = source["running"];
+	        this.port = source["port"];
+	    }
+	}
+
+}
+
+export namespace sites {
 	
 	export class Site {
 	    domain: string;

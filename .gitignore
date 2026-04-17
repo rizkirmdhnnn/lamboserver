@@ -1,4 +1,7 @@
-build/bin
+build/bin/
 node_modules
 frontend/dist
-Raw
+Raw*/
+*.folder/
+.DS_Store
+*.dmg

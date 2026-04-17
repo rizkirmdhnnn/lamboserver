@@ -1,5 +1,0 @@
-CONNECT o167755.ingest.sentry.io:443 HTTP/1.1
-Host: o167755.ingest.sentry.io
-Proxy-Connection: keep-alive
-Connection: keep-alive
-
