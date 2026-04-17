@@ -9,6 +9,7 @@ import (
 	"github.com/rizkirmdhnnn/lamboserver/internal/cert"
 	"github.com/rizkirmdhnnn/lamboserver/internal/config"
 	"github.com/rizkirmdhnnn/lamboserver/internal/services"
+	"github.com/rizkirmdhnnn/lamboserver/internal/tray"
 	"github.com/rizkirmdhnnn/lamboserver/internal/services/dnsmasq"
 	"github.com/rizkirmdhnnn/lamboserver/internal/services/mysql"
 	"github.com/rizkirmdhnnn/lamboserver/internal/services/nginx"
@@ -51,6 +52,7 @@ type App struct {
 	Logs       *logger.Reader
 	Debug      *logger.Logger
 	Shell      *system.Integration
+	Tray       *tray.Controller
 }
 
 // NewApp creates a new App instance, wiring all service managers with their
@@ -149,27 +151,25 @@ func (a *App) startup(ctx context.Context) {
 		}
 	}
 
+	a.Tray = tray.New(a, tray.Icon, "1.0.0")
+	a.Tray.Start()
+	a.Debug.Info("System tray initialized")
+
 	a.restoreSymlinks()
 	a.cleanupStaleAgents()
 	a.ensureServicesRunning()
 }
 
-func (a *App) beforeClose(ctx context.Context) (prevent bool) {
-	dialog, err := wailsRuntime.MessageDialog(ctx, wailsRuntime.MessageDialogOptions{
-		Type:          wailsRuntime.QuestionDialog,
-		Title:         "Quit LamboServer?",
-		Message:       "Menutup aplikasi akan menghentikan semua service (Nginx, DNS, PHP-FPM). Lanjutkan?",
-		DefaultButton: "No",
-		Buttons:       []string{"Yes", "No"},
-	})
-	if err != nil {
-		return false
-	}
-	return dialog != "Yes"
+// Context returns the Wails runtime context for tray callbacks.
+func (a *App) Context() context.Context {
+	return a.ctx
 }
 
 func (a *App) shutdown(ctx context.Context) {
 	a.Debug.Info("LamboServer shutting down, stopping services...")
+	if a.Tray != nil {
+		a.Tray.Destroy()
+	}
 	a.MySQL.Stop()
 	a.Pgweb.Stop()       // D-08: stop pgweb before PostgreSQL (pgweb depends on PG)
 	a.PostgreSQL.Stop()

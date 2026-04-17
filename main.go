@@ -20,14 +20,14 @@ func main() {
 		Width:     1100,
 		Height:    700,
 		MinWidth:  900,
-		MinHeight: 600,
+		MinHeight:         600,
+		HideWindowOnClose: true,
 		AssetServer: &assetserver.Options{
 			Assets: assets,
 		},
 		BackgroundColour: &options.RGBA{R: 24, G: 24, B: 27, A: 1},
-		OnStartup:         app.startup,
-		OnBeforeClose:     app.beforeClose,
-		OnShutdown:        app.shutdown,
+		OnStartup:        app.startup,
+		OnShutdown:       app.shutdown,
 		Mac: &mac.Options{
 			TitleBar: &mac.TitleBar{
 				TitlebarAppearsTransparent: true,
