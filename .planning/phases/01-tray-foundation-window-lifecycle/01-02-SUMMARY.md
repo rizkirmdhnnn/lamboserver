@@ -2,8 +2,7 @@
 phase: 01-tray-foundation-window-lifecycle
 plan: "02"
 subsystem: tray-lifecycle
-status: partial
-checkpoint_reached: task-2
+status: complete
 tags:
   - tray
   - wails
