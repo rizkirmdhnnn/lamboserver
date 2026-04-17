@@ -1,0 +1,63 @@
+name: Release DMG
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.25"
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install Wails
+        run: go install github.com/wailsapp/wails/v2/cmd/wails@latest
+
+      - name: Install frontend dependencies
+        run: cd frontend && npm install
+
+      - name: Get version from tag
+        id: version
+        run: echo "VERSION=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+
+      - name: Build universal .app
+        run: wails build -platform darwin/universal -clean
+
+      - name: Ad-hoc codesign
+        run: |
+          codesign --force --deep -s - --entitlements build/darwin/entitlements.plist build/bin/LamboServer.app
+          codesign --verify --deep build/bin/LamboServer.app
+
+      - name: Create DMG
+        run: |
+          STAGING=$(mktemp -d)
+          cp -r build/bin/LamboServer.app "$STAGING/"
+          ln -s /Applications "$STAGING/Applications"
+          hdiutil create \
+            -volname "LamboServer" \
+            -srcfolder "$STAGING" \
+            -ov \
+            -format UDZO \
+            "LamboServer-${{ steps.version.outputs.VERSION }}.dmg"
+          rm -rf "$STAGING"
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: LamboServer ${{ github.ref_name }}
+          generate_release_notes: true
+          files: LamboServer-${{ steps.version.outputs.VERSION }}.dmg
