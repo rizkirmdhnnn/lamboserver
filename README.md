@@ -1,13 +1,19 @@
 # LamboServer
 
-Open-source local development environment manager for macOS. Manage PHP, Node.js, Nginx, DNS, and SSL — all from a single native desktop app.
+Open-source local development environment manager for macOS. Manage PHP, Node.js, PostgreSQL, MySQL, Nginx, DNS, and SSL — all from a single native desktop app.
 
 Built with [Wails](https://wails.io) (Go + React).
 
 ![macOS](https://img.shields.io/badge/platform-macOS-lightgrey)
-![Go](https://img.shields.io/badge/Go-1.23-00ADD8)
+![Go](https://img.shields.io/badge/Go-1.25-00ADD8)
 ![React](https://img.shields.io/badge/React-18-61DAFB)
 ![License](https://img.shields.io/badge/license-MIT-green)
+
+## Download
+
+Grab the latest DMG from the [Releases](https://github.com/rizkirmdhnnn/lamboserver/releases) page.
+
+> **Note:** LamboServer is ad-hoc signed (no Apple Developer certificate). On first launch, right-click the app and select "Open", then confirm in the dialog.
 
 ## Features
 
@@ -23,6 +29,12 @@ Built with [Wails](https://wails.io) (Go + React).
 - Switch active version instantly
 - Downloads official releases from nodejs.org
 - Shell symlinks for `node` and `npm`
+
+### Database Management
+- **PostgreSQL** — install, start/stop, manage instances
+- **pgweb** — built-in web-based PostgreSQL admin UI
+- **MySQL** — install, start/stop, manage instances
+- **phpMyAdmin** — built-in web-based MySQL admin UI
 
 ### Site Management
 - Link project folders as local `.test` domains
@@ -51,7 +63,6 @@ Built with [Wails](https://wails.io) (Go + React).
 ### Developer Experience
 - Dashboard with service health overview
 - Log viewer for Nginx, PHP-FPM, and dnsmasq
-- Debug mode with detailed action logging
 - One-time admin password prompt (sudoers-based privilege escalation)
 - Shell integration install/uninstall
 
@@ -61,75 +72,76 @@ Built with [Wails](https://wails.io) (Go + React).
 |-----------|-------|-----|
 | *coming soon* | *coming soon* | *coming soon* |
 
-## Requirements
+## Development
+
+### Requirements
 
 - **macOS** (Apple Silicon or Intel)
-- **Go** 1.23+
-- **Node.js** (for frontend development only)
+- **Go** 1.25+
+- **Node.js** 20+ (for frontend)
 - **Wails CLI** v2
 
-## Quick Start
-
-### Install Wails CLI
+### Setup
 
 ```bash
+# Install Wails CLI
 go install github.com/wailsapp/wails/v2/cmd/wails@latest
-```
 
-### Clone & Build
-
-```bash
+# Clone & run in dev mode
 git clone https://github.com/rizkirmdhnnn/lamboserver.git
 cd lamboserver
-wails build
-```
-
-The built app will be at `build/bin/LamboServer.app`.
-
-### Development Mode
-
-```bash
 wails dev
 ```
 
-This starts a Vite dev server with hot-reload for the frontend and live Go backend recompilation.
+### Build
+
+```bash
+# Build .app
+wails build -platform darwin/universal -clean
+
+# Build DMG (ad-hoc signed)
+./scripts/build-dmg.sh
+```
+
+The built app will be at `build/bin/LamboServer.app`.
 
 ## Architecture
 
 ```
 lamboserver/
-├── main.go                     # Wails app entry point
-├── app.go                      # App struct, startup/shutdown, service orchestration
-├── app_*.go                    # Feature-specific API methods (bound to frontend)
+├── main.go                  # Wails entry point
+├── app.go                   # App struct, startup/shutdown, service orchestration
 ├── internal/
-│   ├── system/
-│   │   ├── launchd.go          # macOS LaunchDaemon/Agent management
-│   │   ├── helper.go           # Privileged helper (sudoers-based)
-│   │   ├── paths.go            # Centralized file path management
-│   │   ├── binary.go           # Binary locator and embedded extraction
-│   │   ├── darwin.go           # macOS-specific utilities (admin prompts, keychain)
-│   │   ├── shell.go            # Shell RC integration (~/.zshrc, ~/.bashrc)
-│   │   ├── download.go         # HTTP download with progress
-│   │   └── embedded/           # Bundled nginx and dnsmasq binaries
-│   ├── nginx/                  # Nginx config generation and lifecycle
-│   ├── dns/                    # dnsmasq config and DNS resolver setup
-│   ├── php/                    # PHP version management, FPM, detection
-│   ├── node/                   # Node.js version management
-│   ├── site/                   # Site linking, Nginx vhost generation
-│   ├── cert/                   # CA and SSL certificate management
-│   ├── config/                 # Thread-safe JSON config store
-│   ├── debug/                  # Debug logger
-│   └── log/                    # Log file reader
+│   ├── system/              # macOS launchd, paths, shell integration
+│   ├── process/             # Process runner, PID files, plist generation
+│   ├── config/              # Thread-safe JSON config store
+│   ├── cert/                # CA and SSL certificate management
+│   ├── binaries/            # Binary downloader and registry
+│   ├── sites/               # Site linking, Nginx vhost generation
+│   ├── tray/                # macOS menu bar tray
+│   └── services/
+│       ├── nginx/           # Nginx config and lifecycle
+│       ├── dnsmasq/         # DNS resolver setup
+│       ├── php/             # PHP version management, FPM
+│       ├── nodejs/          # Node.js version management
+│       ├── postgres/        # PostgreSQL management
+│       ├── pgweb/           # pgweb admin interface
+│       ├── mysql/           # MySQL management
+│       └── phpmyadmin/      # phpMyAdmin interface
+├── pkg/
+│   ├── logger/              # Structured logger and log reader
+│   └── notify/              # macOS notifications
+├── scripts/                 # Build and packaging scripts
 └── frontend/
     └── src/
-        ├── App.tsx             # Tab-based navigation
-        └── pages/              # Dashboard, Sites, Services, PHP, Node, Logs
+        ├── App.tsx          # Tab-based navigation
+        └── pages/           # Dashboard, Sites, Services, PHP, Node, Database, Logs
 ```
 
 ### How It Works
 
 1. **First Launch**: Installs a privileged helper script and sudoers entry (one-time admin password prompt)
-2. **Service Management**: Nginx and dnsmasq run as macOS LaunchDaemons (root) for privileged port binding. PHP-FPM runs as a user-level LaunchAgent
+2. **Service Management**: Nginx and dnsmasq run as macOS LaunchDaemons (root) for privileged port binding. PHP-FPM and databases run as user-level LaunchAgents
 3. **Version Switching**: PHP and Node.js versions are managed via symlinks in `~/.lamboserver/bin/`
 4. **Site Linking**: Creates Nginx server blocks pointing to your project directory with optional SSL
 5. **Configuration**: All state persisted in `~/.lamboserver/config.json`
@@ -145,6 +157,8 @@ All runtime data lives in `~/.lamboserver/`:
 ├── dnsmasq/          # dnsmasq config
 ├── php/              # Installed PHP versions
 ├── node/             # Installed Node.js versions
+├── postgres/         # PostgreSQL data
+├── mysql/            # MySQL data
 ├── certs/            # CA and site certificates
 ├── logs/             # Service logs
 └── config.json       # App configuration
@@ -155,7 +169,7 @@ All runtime data lives in `~/.lamboserver/`:
 | Layer | Technology |
 |-------|-----------|
 | Desktop Framework | Wails v2 |
-| Backend | Go 1.23 |
+| Backend | Go 1.25 |
 | Frontend | React 18 + TypeScript |
 | Bundler | Vite |
 | Icons | Lucide React |
