@@ -3,5 +3,7 @@
 
 void CreateTray(const void *iconData, int iconLen, const char *version);
 void DestroyTray(void);
+void UpdateServiceStatus(int index, const char *status);
+void RefreshServiceStatuses(void);
 
 #endif

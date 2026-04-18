@@ -58,3 +58,42 @@ func onQuit() {
 	}
 	wailsRuntime.Quit(ctx)
 }
+
+//export onServiceAction
+func onServiceAction(cName *C.char, cAction *C.char) {
+	if instance == nil || instance.app == nil {
+		return
+	}
+	name := C.GoString(cName)
+	action := C.GoString(cAction)
+	// Fire-and-forget per D-06: no toast, no spinner.
+	go func() {
+		switch action {
+		case "start":
+			instance.app.StartService(name)
+		case "stop":
+			instance.app.StopService(name)
+		case "restart":
+			instance.app.RestartService(name)
+		}
+	}()
+}
+
+//export onRefreshStatuses
+func onRefreshStatuses() {
+	if instance == nil || instance.app == nil {
+		return
+	}
+	statuses := instance.app.GetAllStatuses()
+	// Fixed order per D-02: dnsmasq, nginx, php, mysql, postgresql
+	serviceOrder := []string{"dnsmasq", "nginx", "php", "mysql", "postgresql"}
+	for i, name := range serviceOrder {
+		status, ok := statuses[name]
+		if !ok {
+			status = "not_installed"
+		}
+		cStatus := C.CString(status)
+		C.UpdateServiceStatus(C.int(i), cStatus)
+		C.free(unsafe.Pointer(cStatus))
+	}
+}

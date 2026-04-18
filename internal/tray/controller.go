@@ -7,6 +7,14 @@ import "context"
 type AppController interface {
 	// Context returns the Wails runtime context for Show/Hide/Quit calls.
 	Context() context.Context
+	// GetAllStatuses returns status strings keyed by service registry name.
+	GetAllStatuses() map[string]string
+	// StartService starts the named service.
+	StartService(name string) error
+	// StopService stops the named service.
+	StopService(name string) error
+	// RestartService restarts the named service.
+	RestartService(name string) error
 }
 
 // Controller manages the macOS system tray icon and menu.
