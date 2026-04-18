@@ -6,6 +6,9 @@ extern void onShowWindow(void);
 extern void onQuit(void);
 extern void onServiceAction(const char *name, const char *action);
 extern void onRefreshStatuses(void);
+extern void onOpenSite(const char *domain);
+extern void onOpenWebAdmin(const char *name);
+extern void onRefreshQuickAccess(void);
 
 // Service descriptors: registry key, display name (D-02 dependency order)
 static NSString *serviceKeys[] = {@"dnsmasq", @"nginx", @"php", @"mysql", @"postgresql"};
@@ -17,6 +20,10 @@ static const int kServiceCount = 5;
 @property (strong, nonatomic) NSStatusItem *statusItem;
 @property (strong, nonatomic) NSMutableArray<NSMenuItem *> *serviceItems;
 @property (strong, nonatomic) NSMutableArray<NSMenu *> *serviceSubmenus;
+@property (strong, nonatomic) NSMenu *quickAccessSubmenu;
+@property (strong, nonatomic) NSMutableArray<NSDictionary *> *quickAccessSites;
+@property (assign, nonatomic) int quickAccessOverflow;
+@property (strong, nonatomic) NSMutableArray<NSDictionary *> *quickAccessWebAdmins;
 @end
 
 static LamboSystrayDelegate *delegate = nil;
@@ -46,12 +53,76 @@ static LamboSystrayDelegate *delegate = nil;
     onServiceAction([serviceKeys[idx] UTF8String], "restart");
 }
 
-// NSMenuDelegate: refresh statuses before menu displays (D-07)
+- (void)openSite:(id)sender {
+    NSString *domain = [sender representedObject];
+    onOpenSite([domain UTF8String]);
+}
+
+- (void)openWebAdmin:(id)sender {
+    NSString *name = [sender representedObject];
+    onOpenWebAdmin([name UTF8String]);
+}
+
+- (void)rebuildQuickAccessSubmenu {
+    [self.quickAccessSubmenu removeAllItems];
+
+    BOOL hasSites = self.quickAccessSites.count > 0;
+    BOOL hasWebAdmin = self.quickAccessWebAdmins.count > 0;
+
+    if (!hasSites && !hasWebAdmin) {
+        // D-09: Empty state
+        NSMenuItem *empty = [[NSMenuItem alloc]
+            initWithTitle:@"No sites configured" action:nil keyEquivalent:@""];
+        [empty setEnabled:NO];
+        [self.quickAccessSubmenu addItem:empty];
+        return;
+    }
+
+    // Site items (D-04: already sorted newest-first by Go, D-05: already capped at 15)
+    for (NSDictionary *site in self.quickAccessSites) {
+        NSMenuItem *item = [[NSMenuItem alloc]
+            initWithTitle:site[@"label"]
+                   action:@selector(openSite:)
+            keyEquivalent:@""];
+        [item setTarget:self];
+        [item setRepresentedObject:site[@"domain"]];
+        [self.quickAccessSubmenu addItem:item];
+    }
+
+    // D-05: Overflow indicator
+    if (self.quickAccessOverflow > 0) {
+        NSString *title = [NSString stringWithFormat:
+            @"(+%d more \u2014 see main window)", self.quickAccessOverflow];
+        NSMenuItem *overflow = [[NSMenuItem alloc]
+            initWithTitle:title action:nil keyEquivalent:@""];
+        [overflow setEnabled:NO];
+        [self.quickAccessSubmenu addItem:overflow];
+    }
+
+    // D-10: Separator between sites and web admin tools when both present
+    if (hasSites && hasWebAdmin) {
+        [self.quickAccessSubmenu addItem:[NSMenuItem separatorItem]];
+    }
+
+    // D-07, D-08: Web admin items (only installed ones are passed from Go)
+    for (NSDictionary *wa in self.quickAccessWebAdmins) {
+        NSMenuItem *item = [[NSMenuItem alloc]
+            initWithTitle:wa[@"label"]
+                   action:@selector(openWebAdmin:)
+            keyEquivalent:@""];
+        [item setTarget:self];
+        [item setRepresentedObject:wa[@"name"]];
+        [self.quickAccessSubmenu addItem:item];
+    }
+}
+
+// NSMenuDelegate: refresh statuses before menu displays (D-07, D-11)
 - (void)menuWillOpen:(NSMenu *)menu {
     // Synchronous call into Go. The CGO call chain is:
     // menuWillOpen: (main thread) -> onRefreshStatuses (Go) -> UpdateServiceStatus (C)
     // All on the same thread, so updates apply before menu renders.
     onRefreshStatuses();
+    onRefreshQuickAccess();
 }
 
 - (void)updateServiceItem:(int)index withStatus:(NSString *)status {
@@ -187,6 +258,18 @@ void CreateTray(const void *iconData, int iconLen, const char *version) {
 
         [menu addItem:[NSMenuItem separatorItem]];
 
+        // Quick Access submenu (D-01: single parent item, D-02: between services and Show Window)
+        NSMenuItem *qaItem = [[NSMenuItem alloc]
+            initWithTitle:@"Quick Access" action:nil keyEquivalent:@""];
+        delegate.quickAccessSubmenu = [[NSMenu alloc] init];
+        delegate.quickAccessSites = [NSMutableArray array];
+        delegate.quickAccessWebAdmins = [NSMutableArray array];
+        delegate.quickAccessOverflow = 0;
+        [qaItem setSubmenu:delegate.quickAccessSubmenu];
+        [menu addItem:qaItem];
+
+        [menu addItem:[NSMenuItem separatorItem]];
+
         // Show Window
         NSMenuItem *showItem = [[NSMenuItem alloc]
             initWithTitle:@"Show Window"
@@ -231,4 +314,39 @@ void UpdateServiceStatus(int index, const char *status) {
 // RefreshServiceStatuses is a convenience C wrapper around the Go export.
 void RefreshServiceStatuses(void) {
     onRefreshStatuses();
+}
+
+// -- Quick Access data-passing protocol (Phase 3) ----------------------
+
+void BeginQuickAccessRebuild(int siteCount) {
+    // Clear previous data. Called synchronously from menuWillOpen: chain.
+    [delegate.quickAccessSites removeAllObjects];
+    [delegate.quickAccessWebAdmins removeAllObjects];
+    delegate.quickAccessOverflow = 0;
+}
+
+void AddQuickAccessSite(int index, const char *domain, const char *url, const char *label) {
+    NSDictionary *site = @{
+        @"domain": [NSString stringWithUTF8String:domain],
+        @"url": [NSString stringWithUTF8String:url],
+        @"label": [NSString stringWithUTF8String:label]
+    };
+    [delegate.quickAccessSites addObject:site];
+}
+
+void SetQuickAccessOverflow(int count) {
+    delegate.quickAccessOverflow = count;
+}
+
+void AddQuickAccessWebAdmin(const char *name, const char *label) {
+    NSDictionary *wa = @{
+        @"name": [NSString stringWithUTF8String:name],
+        @"label": [NSString stringWithUTF8String:label]
+    };
+    [delegate.quickAccessWebAdmins addObject:wa];
+}
+
+void CommitQuickAccessRebuild(void) {
+    // All data collected. Now rebuild the submenu UI.
+    [delegate rebuildQuickAccessSubmenu];
 }
