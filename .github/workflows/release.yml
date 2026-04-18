@@ -1,0 +1,74 @@
+name: Release DMG
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.25"
+          cache-dependency-path: go.sum
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install Wails
+        run: go install github.com/wailsapp/wails/v2/cmd/wails@v2.12.0
+
+      - name: Install frontend dependencies
+        run: cd frontend && npm install
+
+      - name: Get version from tag
+        id: version
+        run: echo "VERSION=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+
+      - name: Install create-dmg
+        run: npm install --global create-dmg
+
+      - name: Build, sign, and package
+        run: bash scripts/build-dmg.sh
+        env:
+          CGO_ENABLED: "1"
+          VERSION: ${{ steps.version.outputs.VERSION }}
+
+      - name: Compose release notes
+        run: |
+          VERSION="${{ steps.version.outputs.VERSION }}"
+          DIGEST=$(cut -d' ' -f1 "LamboServer-${VERSION}.dmg.sha256")
+          {
+            cat .github/RELEASE_NOTES_TEMPLATE.md
+            echo ""
+            echo "## Verification"
+            echo ""
+            echo "SHA-256 checksum for \`LamboServer-${VERSION}.dmg\`:"
+            echo '```'
+            echo "${DIGEST}  LamboServer-${VERSION}.dmg"
+            echo '```'
+            echo ""
+            echo "Verify with: \`shasum -c LamboServer-${VERSION}.dmg.sha256\`"
+          } > /tmp/release-notes-final.md
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: LamboServer ${{ github.ref_name }}
+          body_path: /tmp/release-notes-final.md
+          generate_release_notes: true
+          files: |
+            LamboServer-${{ steps.version.outputs.VERSION }}.dmg
+            LamboServer-${{ steps.version.outputs.VERSION }}.dmg.sha256

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <!-- Required: WKWebView uses JIT on Apple Silicon -->
+    <key>com.apple.security.cs.allow-jit</key>
+    <true/>
+    <!-- Required: Wails WebView needs unsigned memory for JS execution -->
+    <key>com.apple.security.cs.allow-unsigned-executable-memory</key>
+    <true/>
+    <!-- Required: Wails embeds third-party frameworks without Apple signatures -->
+    <key>com.apple.security.cs.disable-library-validation</key>
+    <true/>
+    <!-- Required: osascript admin dialogs (RunWithAdminPrivileges).
+         NOTE: The paired string key NSAppleEventsUsageDescription belongs in
+         Info.plist, NOT here. Placing a string value in an entitlements plist
+         causes AMFI to kill ad-hoc signed apps on launch (macOS 26.x, error 163). -->
+    <key>com.apple.security.automation.apple-events</key>
+    <true/>
+    <!-- Required: outgoing HTTP connections (Wails WebView, service health checks) -->
+    <key>com.apple.security.network.client</key>
+    <true/>
+    <!-- Required: local service processes bind ports (pgweb, phpMyAdmin) -->
+    <key>com.apple.security.network.server</key>
+    <true/>
+    <!-- Sandboxing is intentionally omitted: it breaks exec.Command calls to service binaries -->
+</dict>
+</plist>
