@@ -50,15 +50,23 @@ jobs:
           lipo -info "$BINARY" | grep -q "arm64" || { echo "FAIL: missing arm64 arch"; exit 1; }
           echo "OK: Universal binary (arm64 + x86_64)"
 
+      - name: Clear extended attributes
+        run: xattr -cr build/bin/LamboServer.app
+
       - name: Ad-hoc codesign
         run: |
-          codesign --force --deep -s - --entitlements build/darwin/entitlements.plist build/bin/LamboServer.app
-          codesign --verify --deep build/bin/LamboServer.app
+          BINARY="build/bin/LamboServer.app/Contents/MacOS/LamboServer"
+          # Sign the main binary first (--deep is deprecated and unreliable)
+          codesign --force --sign - --entitlements build/darwin/entitlements.plist --options runtime "$BINARY"
+          # Sign the app bundle
+          codesign --force --sign - --entitlements build/darwin/entitlements.plist build/bin/LamboServer.app
+          codesign --verify build/bin/LamboServer.app
 
       - name: Create DMG
         run: |
           STAGING=$(mktemp -d)
           cp -r build/bin/LamboServer.app "$STAGING/"
+          xattr -cr "$STAGING/LamboServer.app"
           ln -s /Applications "$STAGING/Applications"
           hdiutil create \
             -volname "LamboServer" \
