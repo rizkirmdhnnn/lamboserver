@@ -96,6 +96,9 @@ wails dev
 ### Build
 
 ```bash
+# Install DMG packaging tool (one-time, local dev only; CI installs this automatically)
+brew install create-dmg
+
 # Build .app
 wails build -platform darwin/universal -clean
 
