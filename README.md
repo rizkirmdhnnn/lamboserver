@@ -60,6 +60,14 @@ Grab the latest DMG from the [Releases](https://github.com/rizkirmdhnnn/lamboser
 - Per-site SSL certificate generation
 - 10-year certificate validity
 
+### System Tray
+- Native macOS menu bar icon (monochrome template, Dark/Light mode aware)
+- Live service status and start/stop/restart controls from the tray
+- Quick access to recent `.test` sites — opens in default browser
+- Direct links to phpMyAdmin and pgweb web admin tools
+- Show / hide main window and quit from the tray
+- App keeps running in the background when window is closed
+
 ### Developer Experience
 - Dashboard with service health overview
 - Log viewer for Nginx, PHP-FPM, and dnsmasq
@@ -148,7 +156,8 @@ lamboserver/
 2. **Service Management**: Nginx and dnsmasq run as macOS LaunchDaemons (root) for privileged port binding. PHP-FPM and databases run as user-level LaunchAgents
 3. **Version Switching**: PHP and Node.js versions are managed via symlinks in `~/.lamboserver/bin/`
 4. **Site Linking**: Creates Nginx server blocks pointing to your project directory with optional SSL
-5. **Configuration**: All state persisted in `~/.lamboserver/config.json`
+5. **System Tray**: Menu bar controller bridges to AppKit via CGO (NSStatusBar / NSMenu); closing the window keeps the app alive in the tray
+6. **Configuration**: All state persisted in `~/.lamboserver/config.json`
 
 ### Data Directory
 
