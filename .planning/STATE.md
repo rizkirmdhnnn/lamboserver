@@ -1,17 +1,17 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.0
-milestone_name: System Tray Integration
-status: milestone_complete
-stopped_at: v1.0 milestone archived
-last_updated: "2026-04-18T05:00:00.000Z"
-last_activity: 2026-04-18 -- v1.0 milestone archived
+milestone: v1.1
+milestone_name: Build Pipeline Overhaul
+status: defining_requirements
+stopped_at: Defining requirements for v1.1
+last_updated: "2026-04-18T06:00:00.000Z"
+last_activity: 2026-04-18 -- Milestone v1.1 started
 progress:
-  total_phases: 4
-  completed_phases: 4
-  total_plans: 7
-  completed_plans: 7
-  percent: 100
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
 ---
 
 # Project State
@@ -21,16 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-18)
 
 **Core value:** Users can control their local dev services instantly from the system tray without opening the full application window.
-**Current focus:** Milestone v1.0 complete — planning next milestone
+**Current focus:** Milestone v1.1 — Build Pipeline Overhaul
 
 ## Current Position
 
-Phase: All complete
-Plan: All complete
-Status: v1.0 milestone shipped and archived
-Last activity: 2026-04-18 -- v1.0 milestone archived
-
-Progress: [████████████████████] 100%
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-04-18 — Milestone v1.1 started
 
 ## Deferred Items
 
@@ -44,5 +42,5 @@ Progress: [████████████████████] 100%
 ## Session Continuity
 
 Last session: 2026-04-18
-Stopped at: v1.0 milestone archived
-Resume file: .planning/MILESTONES.md
+Stopped at: Defining requirements for v1.1
+Resume file: .planning/PROJECT.md

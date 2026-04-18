@@ -2,11 +2,21 @@
 
 ## What This Is
 
-LamboServer is a macOS local development environment manager that controls Nginx, MySQL, PHP, PostgreSQL, Node.js, and related tools through a native desktop GUI. v1.0 added system tray integration so the app runs in the background with a tray icon, giving users quick access to service controls, status, and navigation without needing the full window open.
+LamboServer is a macOS local development environment manager that controls Nginx, MySQL, PHP, PostgreSQL, Node.js, and related tools through a native desktop GUI. It features system tray integration for quick access to service controls without opening the full window.
 
 ## Core Value
 
 Users can control their local dev services instantly from the system tray without opening the full application window.
+
+## Current Milestone: v1.1 Build Pipeline Overhaul
+
+**Goal:** Fix the "app is damaged" launch error and overhaul the entire build-to-distribution pipeline for reliable, professional DMG releases.
+
+**Target features:**
+- Fix "app is damaged" error — app must launch without quarantine workarounds on macOS Sequoia
+- Professional DMG installer — custom background, icon layout, drag-to-Applications visual
+- Improved code signing — investigate options beyond ad-hoc (self-signed cert, Developer ID)
+- Robust CI pipeline — better versioning, artifact caching, build verification, reliable release workflow
 
 ## Requirements
 
@@ -34,7 +44,10 @@ Users can control their local dev services instantly from the system tray withou
 
 ### Active
 
-(No active requirements — next milestone TBD)
+- [ ] Fix "app is damaged" launch error on macOS Sequoia
+- [ ] Professional DMG installer with custom background and drag-to-Applications
+- [ ] Improved code signing beyond ad-hoc
+- [ ] Robust CI pipeline with better versioning and build verification
 
 ### Out of Scope
 
@@ -76,5 +89,22 @@ Users can control their local dev services instantly from the system tray withou
 
 This document evolves at phase transitions and milestone boundaries.
 
+## Evolution
+
+This document evolves at phase transitions and milestone boundaries.
+
+**After each phase transition** (via `/gsd-transition`):
+1. Requirements invalidated? → Move to Out of Scope with reason
+2. Requirements validated? → Move to Validated with phase reference
+3. New requirements emerged? → Add to Active
+4. Decisions to log? → Add to Key Decisions
+5. "What This Is" still accurate? → Update if drifted
+
+**After each milestone** (via `/gsd-complete-milestone`):
+1. Full review of all sections
+2. Core Value check — still the right priority?
+3. Audit Out of Scope — reasons still valid?
+4. Update Context with current state
+
 ---
-*Last updated: 2026-04-18 after v1.0 milestone*
+*Last updated: 2026-04-18 after v1.1 milestone start*
