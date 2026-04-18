@@ -1,11 +1,11 @@
 ---
 gsd_state_version: 1.0
 milestone: v1.0
-milestone_name: milestone
-status: complete
-stopped_at: All phases complete
-last_updated: "2026-04-18T04:35:00.000Z"
-last_activity: 2026-04-18 -- Phase 04 complete (verified)
+milestone_name: System Tray Integration
+status: milestone_complete
+stopped_at: v1.0 milestone archived
+last_updated: "2026-04-18T05:00:00.000Z"
+last_activity: 2026-04-18 -- v1.0 milestone archived
 progress:
   total_phases: 4
   completed_phases: 4
@@ -18,58 +18,19 @@ progress:
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-04-17)
+See: .planning/PROJECT.md (updated 2026-04-18)
 
 **Core value:** Users can control their local dev services instantly from the system tray without opening the full application window.
-**Current focus:** Phase 04 — Build Pipeline
+**Current focus:** Milestone v1.0 complete — planning next milestone
 
 ## Current Position
 
-Phase: 4 (complete)
+Phase: All complete
 Plan: All complete
-Status: Milestone complete
-Last activity: 2026-04-18 -- Phase 04 complete (verified)
+Status: v1.0 milestone shipped and archived
+Last activity: 2026-04-18 -- v1.0 milestone archived
 
-Progress: [██████████] 100%
-
-## Performance Metrics
-
-**Velocity:**
-
-- Total plans completed: 2
-- Average duration: —
-- Total execution time: 0 hours
-
-**By Phase:**
-
-| Phase | Plans | Total | Avg/Plan |
-|-------|-------|-------|----------|
-| 01 | 2 | - | - |
-
-**Recent Trend:**
-
-- Last 5 plans: —
-- Trend: —
-
-*Updated after each plan completion*
-
-## Accumulated Context
-
-### Decisions
-
-Decisions are logged in PROJECT.md Key Decisions table.
-Recent decisions affecting current work:
-
-- Phase 1: Custom CGO package using NSStatusBar directly — all standard systray libraries are incompatible with Wails v2
-- Phase 1: Hide-to-tray on window close, no confirmation dialog
-
-### Pending Todos
-
-None yet.
-
-### Blockers/Concerns
-
-- Phase 1 carries highest implementation risk: CGO package must be built from scratch using NSStatusBar ObjC bridge. No existing library can be reused.
+Progress: [████████████████████] 100%
 
 ## Deferred Items
 
@@ -83,5 +44,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-04-18
-Stopped at: All phases complete
-Resume file: .planning/phases/04-build-pipeline/04-VERIFICATION.md
+Stopped at: v1.0 milestone archived
+Resume file: .planning/MILESTONES.md
