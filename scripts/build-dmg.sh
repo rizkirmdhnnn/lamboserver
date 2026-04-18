@@ -21,11 +21,14 @@ echo "[3/6] Clearing quarantine and provenance attributes..."
 xattr -cr "${APP_PATH}"
 echo "  Extended attributes cleared"
 
-echo "[4/6] Ad-hoc signing with entitlements and runtime hardening..."
+echo "[4/6] Ad-hoc signing with entitlements..."
+# NOTE: --options runtime (hardened runtime) is intentionally omitted. Hardened
+# runtime is designed for Developer ID + notarization; combined with ad-hoc
+# signing it triggers SIGKILL on launch via AMFI on macOS 26.x (error 163,
+# "Launchd job spawn failed"). Signature + entitlements alone are sufficient.
 codesign \
   --force \
   --sign - \
-  --options runtime \
   --entitlements "${ENTITLEMENTS}" \
   "${APP_PATH}"
 echo "  Signed: ${APP_PATH}"

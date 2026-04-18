@@ -11,11 +11,12 @@
     <!-- Required: Wails embeds third-party frameworks without Apple signatures -->
     <key>com.apple.security.cs.disable-library-validation</key>
     <true/>
-    <!-- Required: osascript admin dialogs (RunWithAdminPrivileges) -->
+    <!-- Required: osascript admin dialogs (RunWithAdminPrivileges).
+         NOTE: The paired string key NSAppleEventsUsageDescription belongs in
+         Info.plist, NOT here. Placing a string value in an entitlements plist
+         causes AMFI to kill ad-hoc signed apps on launch (macOS 26.x, error 163). -->
     <key>com.apple.security.automation.apple-events</key>
     <true/>
-    <key>NSAppleEventsUsageDescription</key>
-    <string>LamboServer uses administrator dialogs to install system services.</string>
     <!-- Required: outgoing HTTP connections (Wails WebView, service health checks) -->
     <key>com.apple.security.network.client</key>
     <true/>
