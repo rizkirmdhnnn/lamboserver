@@ -97,3 +97,60 @@ func onRefreshStatuses() {
 		C.free(unsafe.Pointer(cStatus))
 	}
 }
+
+//export onOpenSite
+func onOpenSite(cDomain *C.char) {
+	if instance == nil || instance.app == nil {
+		return
+	}
+	domain := C.GoString(cDomain)
+	go func() {
+		instance.app.OpenSiteInBrowser(domain)
+	}()
+}
+
+//export onOpenWebAdmin
+func onOpenWebAdmin(cName *C.char) {
+	if instance == nil || instance.app == nil {
+		return
+	}
+	name := C.GoString(cName)
+	go func() {
+		instance.app.OpenWebAdmin(name)
+	}()
+}
+
+//export onRefreshQuickAccess
+func onRefreshQuickAccess() {
+	if instance == nil || instance.app == nil {
+		return
+	}
+	sites := instance.app.GetTraySites()
+	C.BeginQuickAccessRebuild(C.int(len(sites)))
+	for i, s := range sites {
+		cDomain := C.CString(s.Domain)
+		cURL := C.CString(s.URL)
+		cLabel := C.CString(s.Label)
+		C.AddQuickAccessSite(C.int(i), cDomain, cURL, cLabel)
+		C.free(unsafe.Pointer(cDomain))
+		C.free(unsafe.Pointer(cURL))
+		C.free(unsafe.Pointer(cLabel))
+	}
+	overflow := instance.app.GetTotalSiteCount() - len(sites)
+	if overflow < 0 {
+		overflow = 0
+	}
+	C.SetQuickAccessOverflow(C.int(overflow))
+	webAdmins := instance.app.GetWebAdminItems()
+	for _, wa := range webAdmins {
+		if !wa.Installed {
+			continue
+		}
+		cName := C.CString(wa.Name)
+		cLabel := C.CString(wa.Label)
+		C.AddQuickAccessWebAdmin(cName, cLabel)
+		C.free(unsafe.Pointer(cName))
+		C.free(unsafe.Pointer(cLabel))
+	}
+	C.CommitQuickAccessRebuild()
+}
