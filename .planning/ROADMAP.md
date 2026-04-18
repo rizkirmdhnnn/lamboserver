@@ -21,7 +21,7 @@
 
 **Milestone Goal:** Fix the "app is damaged" launch error and overhaul the build-to-distribution pipeline for reliable, professional DMG releases.
 
-- [ ] **Phase 5: Signing Correctness** - Fix codesign invocation, verify entitlements, audit embedded binaries
+- [x] **Phase 5: Signing Correctness** - Fix codesign invocation, verify entitlements, audit embedded binaries (completed 2026-04-18)
 - [ ] **Phase 6: CI Pipeline Hardening** - Pin tools, enable caching, sync version, add SHA-256 artifact and release docs
 - [ ] **Phase 7: Professional DMG Appearance** - Custom background, drag-to-Applications layout, Retina support
 
@@ -36,10 +36,10 @@
   2. `codesign --verify --deep --strict` reports a valid signature on the built `.app` bundle
   3. Entitlements are present and verified by CI — `codesign -d --entitlements` gate passes before DMG creation
   4. Embedded nginx and dnsmasq binaries are ad-hoc codesigned for ARM64/universal at extraction time
-**Plans:** 2 plans
+**Plans:** 2/2 plans complete
 Plans:
 - [x] 05-01-PLAN.md — Fix build script signing and add runtime binary codesigning
-- [ ] 05-02-PLAN.md — Simplify CI pipeline to call build-dmg.sh
+- [x] 05-02-PLAN.md — Simplify CI pipeline to call build-dmg.sh
 
 ### Phase 6: CI Pipeline Hardening
 **Goal**: The GitHub Actions release pipeline is deterministic, cached, and produces a verifiable artifact with user-facing installation guidance
@@ -72,6 +72,6 @@ Plans:
 | 2. Service Controls | v1.0 | 2/2 | Complete | 2026-04-18 |
 | 3. Quick Access Links | v1.0 | 2/2 | Complete | 2026-04-18 |
 | 4. Build Pipeline | v1.0 | 1/1 | Complete | 2026-04-18 |
-| 5. Signing Correctness | v1.1 | 0/2 | Not started | - |
+| 5. Signing Correctness | v1.1 | 2/2 | Complete   | 2026-04-18 |
 | 6. CI Pipeline Hardening | v1.1 | 0/? | Not started | - |
 | 7. Professional DMG Appearance | v1.1 | 0/? | Not started | - |

@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Build Pipeline Overhaul
-status: executing
-stopped_at: Completed 05-signing-correctness-01-PLAN.md
-last_updated: "2026-04-18T08:53:59.966Z"
+status: verifying
+stopped_at: Completed 05-signing-correctness-02-PLAN.md
+last_updated: "2026-04-18T08:56:44.514Z"
 last_activity: 2026-04-18
 progress:
   total_phases: 3
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 2
-  completed_plans: 1
-  percent: 50
+  completed_plans: 2
+  percent: 100
 ---
 
 # Project State
@@ -27,7 +27,7 @@ See: .planning/PROJECT.md (updated 2026-04-18)
 
 Phase: 5 (Signing Correctness) — EXECUTING
 Plan: 2 of 2
-Status: Ready to execute
+Status: Phase complete — ready for verification
 Last activity: 2026-04-18
 
 Progress: [░░░░░░░░░░] 0%
@@ -48,6 +48,7 @@ Progress: [░░░░░░░░░░] 0%
 
 *Updated after each plan completion*
 | Phase 05-signing-correctness P01 | 2min | 2 tasks | 2 files |
+| Phase 05-signing-correctness P02 | 1min | 1 tasks | 1 files |
 
 ## Accumulated Context
 
@@ -61,6 +62,7 @@ Recent decisions affecting current work:
 - Research: Use `--sandbox-safe` flag with `create-dmg` for headless CI compatibility
 - [Phase 05-signing-correctness]: Removed two-step signing (sign binary then bundle) — replaced with single bundle-level codesign to prevent CodeResources conflict on macOS Sequoia
 - [Phase 05-signing-correctness]: codesignBinary failure in ExtractBinary is non-fatal (D-08): warn to stderr, return nil regardless
+- [Phase 05-signing-correctness]: Removed 5 inline CI steps; single bash scripts/build-dmg.sh call is the only build step — signing fixes from Plan 01 now apply to CI (D-01, D-02)
 
 ### Pending Todos
 
@@ -84,6 +86,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-18T08:53:59.963Z
-Stopped at: Completed 05-signing-correctness-01-PLAN.md
+Last session: 2026-04-18T08:56:44.511Z
+Stopped at: Completed 05-signing-correctness-02-PLAN.md
 Resume file: None
