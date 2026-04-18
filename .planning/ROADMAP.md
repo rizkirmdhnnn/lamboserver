@@ -38,7 +38,7 @@
   4. Embedded nginx and dnsmasq binaries are ad-hoc codesigned for ARM64/universal at extraction time
 **Plans:** 2 plans
 Plans:
-- [ ] 05-01-PLAN.md — Fix build script signing and add runtime binary codesigning
+- [x] 05-01-PLAN.md — Fix build script signing and add runtime binary codesigning
 - [ ] 05-02-PLAN.md — Simplify CI pipeline to call build-dmg.sh
 
 ### Phase 6: CI Pipeline Hardening
