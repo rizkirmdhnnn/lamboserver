@@ -752,6 +752,13 @@ func (a *App) GetTotalSiteCount() int {
 	return len(a.Sites.List())
 }
 
+// OpenWebAdminInBrowser opens the named web admin tool in the default browser.
+// Fire-and-forget wrapper for tray.AppController (no error return).
+func (a *App) OpenWebAdminInBrowser(name string) {
+	a.Debug.Info("OpenWebAdminInBrowser called: %s", name)
+	_ = a.OpenWebAdmin(name)
+}
+
 // CreateSite creates an Nginx virtual host and SSL certificate for the given
 // domain and path, then reloads Nginx.
 func (a *App) CreateSite(domain, path, phpVersion string) error {

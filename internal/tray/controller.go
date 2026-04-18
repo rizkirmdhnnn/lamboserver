@@ -24,8 +24,9 @@ type AppController interface {
 	OpenSiteInBrowser(domain string)
 	// GetWebAdminItems returns install status and URL for phpMyAdmin and pgweb (D-07, D-08).
 	GetWebAdminItems() []WebAdminItem
-	// OpenWebAdmin opens the named web admin tool in the default browser (D-08).
-	OpenWebAdmin(name string)
+	// OpenWebAdminInBrowser opens the named web admin tool in the default browser (D-08).
+	// Named differently from App.OpenWebAdmin (which returns error for Wails IPC).
+	OpenWebAdminInBrowser(name string)
 	// GetTotalSiteCount returns total site count for overflow computation (D-05).
 	GetTotalSiteCount() int
 }

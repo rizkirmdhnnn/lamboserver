@@ -116,7 +116,7 @@ func onOpenWebAdmin(cName *C.char) {
 	}
 	name := C.GoString(cName)
 	go func() {
-		instance.app.OpenWebAdmin(name)
+		instance.app.OpenWebAdminInBrowser(name)
 	}()
 }
 
