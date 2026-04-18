@@ -2,26 +2,60 @@
 set -e
 
 APP_NAME="LamboServer"
-VERSION=$(grep -o '"productVersion": *"[^"]*"' wails.json | grep -o '[0-9][0-9.]*')
+ENTS_DUMP=""
+STAGING=""
+
+# Consolidated EXIT handler: one trap registration for all cleanup concerns.
+# NOTE: bash's `trap` does NOT accumulate — a second `trap ... EXIT` would
+# silently replace this one (Pitfall 1). All future cleanup goes in this
+# function, never in a second `trap` call.
+cleanup() {
+  [ -n "${STAGING}" ] && rm -rf "${STAGING}"
+  [ -n "${ENTS_DUMP}" ] && rm -f "${ENTS_DUMP}"
+  [ -f "wails.json.bak" ] && mv wails.json.bak wails.json
+}
+trap cleanup EXIT
+
+# Step 1: Sync productVersion from VERSION env (CI path) or read from wails.json (local path).
+# D-03/D-04/D-05: when VERSION is set, rewrite wails.json in place with backup;
+# trap above restores wails.json on any exit. When VERSION is unset, fall back
+# to the committed productVersion (current local-dev behavior).
+if [ -n "${VERSION:-}" ]; then
+  echo "[1/7] Syncing version from environment: ${VERSION}"
+  cp wails.json wails.json.bak
+  python3 -c "
+import json, sys
+with open('wails.json') as f:
+    data = json.load(f)
+data['info']['productVersion'] = sys.argv[1]
+with open('wails.json', 'w') as f:
+    json.dump(data, f, indent=2)
+" "${VERSION}"
+  echo "  wails.json productVersion set to ${VERSION}"
+else
+  VERSION=$(grep -o '"productVersion": *"[^"]*"' wails.json | grep -o '[0-9][0-9.]*')
+  echo "[1/7] Using version from wails.json: ${VERSION}"
+fi
+
 APP_PATH="build/bin/${APP_NAME}.app"
 DMG_OUT="${APP_NAME}-${VERSION}.dmg"
 ENTITLEMENTS="build/darwin/entitlements.plist"
 
-echo "[1/6] Building universal .app..."
+echo "[2/7] Building universal .app..."
 CGO_ENABLED=1 wails build -platform darwin/universal -clean
 
-echo "[2/6] Verifying CGO tray linkage..."
+echo "[3/7] Verifying CGO tray linkage..."
 otool -L "${APP_PATH}/Contents/MacOS/${APP_NAME}" | grep -q "Cocoa.framework" || { echo "FAIL: Cocoa.framework not linked"; exit 1; }
 echo "  Cocoa.framework linked"
 lipo -info "${APP_PATH}/Contents/MacOS/${APP_NAME}" | grep -q "x86_64" || { echo "FAIL: missing x86_64 arch"; exit 1; }
 lipo -info "${APP_PATH}/Contents/MacOS/${APP_NAME}" | grep -q "arm64" || { echo "FAIL: missing arm64 arch"; exit 1; }
 echo "  Universal binary (arm64 + x86_64)"
 
-echo "[3/6] Clearing quarantine and provenance attributes..."
+echo "[4/7] Clearing quarantine and provenance attributes..."
 xattr -cr "${APP_PATH}"
 echo "  Extended attributes cleared"
 
-echo "[4/6] Ad-hoc signing with entitlements..."
+echo "[5/7] Ad-hoc signing with entitlements..."
 # NOTE: --options runtime (hardened runtime) is intentionally omitted. Hardened
 # runtime is designed for Developer ID + notarization; combined with ad-hoc
 # signing it triggers SIGKILL on launch via AMFI on macOS 26.x (error 163,
@@ -59,9 +93,8 @@ for key in "${REQUIRED_KEYS[@]}"; do
 done
 echo "  Gate 2 passed: all 6 entitlements present"
 
-echo "[5/6] Packaging DMG..."
+echo "[6/7] Packaging DMG..."
 STAGING=$(mktemp -d)
-trap "rm -f ${ENTS_DUMP}; rm -rf ${STAGING}" EXIT
 cp -r "${APP_PATH}" "${STAGING}/"
 # Clear xattrs on the staging copy so DMG contents are clean
 xattr -cr "${STAGING}/${APP_NAME}.app"
@@ -73,7 +106,12 @@ hdiutil create \
   -format UDZO \
   "${DMG_OUT}"
 
-echo "[6/6] Done. Output: ${DMG_OUT}"
+echo "[7/7] Generating SHA-256 checksum..."
+shasum -a 256 "${DMG_OUT}" > "${DMG_OUT}.sha256"
+echo "  Checksum file: ${DMG_OUT}.sha256"
+echo "  $(cat "${DMG_OUT}.sha256")"
+
+echo "Done. Output: ${DMG_OUT}"
 echo ""
 echo "To open after downloading:"
 echo "  xattr -cr /Applications/${APP_NAME}.app"
