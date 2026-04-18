@@ -22,7 +22,7 @@
 **Milestone Goal:** Fix the "app is damaged" launch error and overhaul the build-to-distribution pipeline for reliable, professional DMG releases.
 
 - [x] **Phase 5: Signing Correctness** - Fix codesign invocation, verify entitlements, audit embedded binaries (completed 2026-04-18)
-- [ ] **Phase 6: CI Pipeline Hardening** - Pin tools, enable caching, sync version, add SHA-256 artifact and release docs
+- [x] **Phase 6: CI Pipeline Hardening** - Pin tools, enable caching, sync version, add SHA-256 artifact and release docs (completed 2026-04-18)
 - [ ] **Phase 7: Professional DMG Appearance** - Custom background, drag-to-Applications layout, Retina support
 
 ## Phase Details
@@ -51,17 +51,25 @@ Plans:
   3. The DMG release artifact is accompanied by a `SHA-256` checksum file for download verification
   4. GitHub Release notes include macOS Sequoia first-launch instructions (Privacy & Security flow)
   5. The app version shown in release assets matches the git tag that triggered the build
-**Plans**: TBD
+**Plans:** 3/3 plans complete
+Plans:
+- [x] 06-01-ci-runner-caching-PLAN.md — Pin runner + Wails CLI, enable Go/npm caching, export VERSION to build-dmg.sh
+- [x] 06-02-build-script-version-checksum-PLAN.md — Extend build-dmg.sh with version-sync and SHA-256 checksum; consolidate cleanup trap
+- [x] 06-03-release-notes-composition-PLAN.md — Create RELEASE_NOTES_TEMPLATE.md; add CI Compose step; wire softprops body_path + two-file upload
 
 ### Phase 7: Professional DMG Appearance
-**Goal**: The DMG installer presents a polished drag-to-Applications experience with a branded background on Retina displays
+**Goal**: The DMG installer presents a polished drag-to-Applications experience on Retina displays using `sindresorhus/create-dmg`'s auto-composed visual
 **Depends on**: Phase 6
 **Requirements**: DMG-01, DMG-02, DMG-03
 **Success Criteria** (what must be TRUE):
-  1. Opening the DMG shows a custom 660x400px background with the app logo and a drag-to-Applications arrow
-  2. App icon and Applications symlink are positioned in the designed layout via `create-dmg`
-  3. The background renders sharply on Retina displays using the included @2x variant
-**Plans**: TBD
+  1. Opening the DMG shows a polished drag-to-Applications visual auto-composed by `sindresorhus/create-dmg` from the app icon
+  2. The Applications alias and app icon are laid out by the tool's defaults (no manual coordinates required)
+  3. Output file preserves the Phase 6 filename contract (`LamboServer-<VERSION>.dmg` + `.sha256` sidecar)
+**Plans:** 3 plans (revised post-implementation — see 07-CONTEXT.md Revision Note)
+Plans:
+- [x] 07-01-PLAN.md — (retired) Background PNG generator — superseded by sindresorhus/create-dmg auto-composition
+- [x] 07-02-PLAN.md — Swap build-dmg.sh packaging step to sindresorhus/create-dmg + filename rename
+- [x] 07-03-PLAN.md — Add `npm install -g create-dmg` CI step and README one-liner
 **UI hint**: yes
 
 ## Progress
@@ -73,5 +81,5 @@ Plans:
 | 3. Quick Access Links | v1.0 | 2/2 | Complete | 2026-04-18 |
 | 4. Build Pipeline | v1.0 | 1/1 | Complete | 2026-04-18 |
 | 5. Signing Correctness | v1.1 | 2/2 | Complete   | 2026-04-18 |
-| 6. CI Pipeline Hardening | v1.1 | 0/? | Not started | - |
-| 7. Professional DMG Appearance | v1.1 | 0/? | Not started | - |
+| 6. CI Pipeline Hardening | v1.1 | 3/3 | Complete    | 2026-04-18 |
+| 7. Professional DMG Appearance | v1.1 | 3/3 | Complete    | 2026-04-18 |

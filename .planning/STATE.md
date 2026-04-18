@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Build Pipeline Overhaul
-status: verifying
-stopped_at: Completed 05-signing-correctness-02-PLAN.md
-last_updated: "2026-04-18T08:56:44.514Z"
-last_activity: 2026-04-18
+status: phase_complete
+stopped_at: Phase 7 complete — human visual DMG check pending
+last_updated: "2026-04-18T11:31:01.440Z"
+last_activity: 2026-04-18 -- Phase 7 complete (3/3 plans merged, verified)
 progress:
   total_phases: 3
-  completed_phases: 1
-  total_plans: 2
-  completed_plans: 2
+  completed_phases: 3
+  total_plans: 11
+  completed_plans: 11
   percent: 100
 ---
 
@@ -21,22 +21,22 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-18)
 
 **Core value:** Users can control their local dev services instantly from the system tray without opening the full application window.
-**Current focus:** Phase 5 — Signing Correctness
+**Current focus:** Phase 7 complete — milestone v1.1 done pending human DMG visual check
 
 ## Current Position
 
-Phase: 5 (Signing Correctness) — EXECUTING
-Plan: 2 of 2
-Status: Phase complete — ready for verification
-Last activity: 2026-04-18
+Phase: 7 (Professional DMG Appearance) — COMPLETE (3/3 plans merged, verified at HEAD 4c11234)
+Plan: 3 of 3
+Status: Phase 7 complete (human visual DMG smoke test pending)
+Last activity: 2026-04-18 -- Phase 7 complete (create-dmg packaging wired end-to-end)
 
-Progress: [░░░░░░░░░░] 0%
+Progress: [██████████] 100%
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 0 (this milestone)
+- Total plans completed: 3 (this milestone)
 - Average duration: —
 - Total execution time: —
 
@@ -44,7 +44,7 @@ Progress: [░░░░░░░░░░] 0%
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| - | - | - | - |
+| 6 | 3 | - | - |
 
 *Updated after each plan completion*
 | Phase 05-signing-correctness P01 | 2min | 2 tasks | 2 files |
@@ -70,7 +70,7 @@ None yet.
 
 ### Blockers/Concerns
 
-- Phase 7 (DMG Appearance) requires design asset `build/darwin/dmg-background.png` (660x400px PNG) — must be created before Phase 7 execution
+- None. Phase 7 resolved the `build/darwin/dmg-background.png` asset blocker via scripts/gen-dmg-background.py (committed PNG + @2x variant).
 
 ## Deferred Items
 
@@ -86,6 +86,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-18T08:56:44.511Z
-Stopped at: Completed 05-signing-correctness-02-PLAN.md
-Resume file: None
+Last session: 2026-04-18T10:56:11.982Z
+Stopped at: Phase 7 context gathered
+Resume file: .planning/phases/07-professional-dmg-appearance/07-CONTEXT.md
