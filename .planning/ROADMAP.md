@@ -15,7 +15,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [ ] **Phase 1: Tray Foundation & Window Lifecycle** - Custom CGO tray package renders icon in menu bar; closing window hides to tray
 - [x] **Phase 2: Service Controls** - Tray menu shows per-service status and exposes Start/Stop/Restart actions
 - [x] **Phase 3: Quick Access Links** - Tray menu lists configured sites and web admin tools for one-click browser launch
-- [ ] **Phase 4: Build Pipeline** - Info.plist patching and CI pipeline updated to support CGO tray builds
+- [x] **Phase 4: Build Pipeline** - CI pipeline and local build script updated to support CGO tray builds with verification
 
 ## Phase Details
 
@@ -62,13 +62,16 @@ Plans:
 - [x] 03-02-PLAN.md — Implement ObjC Quick Access submenu with site items, web admin items, refresh logic, and verify
 
 ### Phase 4: Build Pipeline
-**Goal**: The app builds and ships correctly with CGO tray support — Info.plist is patched and CI produces a valid artifact
+**Goal**: The app builds and ships correctly with CGO tray support — CI pipeline and local build script produce valid artifacts with CGO compilation and binary verification
 **Depends on**: Phase 3
 **Requirements**: TRAY-04, TRAY-05
 **Success Criteria** (what must be TRUE):
-  1. Post-build script patches Info.plist with the correct keys for system tray behavior (LSUIElement or equivalent)
-  2. CI pipeline produces a signed DMG artifact with CGO compilation enabled and no build failures
-**Plans**: TBD
+  1. Info.plist needs no tray-specific keys — existing plist is verified correct (no LSUIElement, NSStatusBar works at runtime via CGO)
+  2. CI pipeline produces a signed DMG artifact with CGO compilation enabled, Cocoa.framework linkage verified, and universal binary confirmed
+  3. Local build script matches CI behavior with CGO_ENABLED=1 and binary verification
+**Plans**: 1 plan
+Plans:
+- [x] 04-01-PLAN.md — Add CGO_ENABLED=1 and binary verification to CI pipeline and local build script
 
 ## Progress
 
@@ -80,4 +83,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 | 1. Tray Foundation & Window Lifecycle | 2/2 | Complete | 2026-04-17 |
 | 2. Service Controls | 2/2 | Complete | 2026-04-18 |
 | 3. Quick Access Links | 2/2 | Complete | 2026-04-18 |
-| 4. Build Pipeline | 0/TBD | Not started | - |
+| 4. Build Pipeline | 1/1 | Complete | 2026-04-18 |
