@@ -368,3 +368,42 @@ export namespace sites {
 
 }
 
+export namespace tray {
+	
+	export class SiteInfo {
+	    Domain: string;
+	    URL: string;
+	    Label: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new SiteInfo(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.Domain = source["Domain"];
+	        this.URL = source["URL"];
+	        this.Label = source["Label"];
+	    }
+	}
+	export class WebAdminItem {
+	    Name: string;
+	    Label: string;
+	    Installed: boolean;
+	    URL: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new WebAdminItem(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.Name = source["Name"];
+	        this.Label = source["Label"];
+	        this.Installed = source["Installed"];
+	        this.URL = source["URL"];
+	    }
+	}
+
+}
+

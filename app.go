@@ -4,11 +4,13 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"sort"
 
 	"github.com/pkg/browser"
 	"github.com/rizkirmdhnnn/lamboserver/internal/cert"
 	"github.com/rizkirmdhnnn/lamboserver/internal/config"
 	"github.com/rizkirmdhnnn/lamboserver/internal/services"
+	"github.com/rizkirmdhnnn/lamboserver/internal/tray"
 	"github.com/rizkirmdhnnn/lamboserver/internal/services/dnsmasq"
 	"github.com/rizkirmdhnnn/lamboserver/internal/services/mysql"
 	"github.com/rizkirmdhnnn/lamboserver/internal/services/nginx"
@@ -51,6 +53,7 @@ type App struct {
 	Logs       *logger.Reader
 	Debug      *logger.Logger
 	Shell      *system.Integration
+	Tray       *tray.Controller
 }
 
 // NewApp creates a new App instance, wiring all service managers with their
@@ -149,27 +152,25 @@ func (a *App) startup(ctx context.Context) {
 		}
 	}
 
+	a.Tray = tray.New(a, tray.Icon, "1.0.0")
+	a.Tray.Start()
+	a.Debug.Info("System tray initialized")
+
 	a.restoreSymlinks()
 	a.cleanupStaleAgents()
 	a.ensureServicesRunning()
 }
 
-func (a *App) beforeClose(ctx context.Context) (prevent bool) {
-	dialog, err := wailsRuntime.MessageDialog(ctx, wailsRuntime.MessageDialogOptions{
-		Type:          wailsRuntime.QuestionDialog,
-		Title:         "Quit LamboServer?",
-		Message:       "Menutup aplikasi akan menghentikan semua service (Nginx, DNS, PHP-FPM). Lanjutkan?",
-		DefaultButton: "No",
-		Buttons:       []string{"Yes", "No"},
-	})
-	if err != nil {
-		return false
-	}
-	return dialog != "Yes"
+// Context returns the Wails runtime context for tray callbacks.
+func (a *App) Context() context.Context {
+	return a.ctx
 }
 
 func (a *App) shutdown(ctx context.Context) {
 	a.Debug.Info("LamboServer shutting down, stopping services...")
+	if a.Tray != nil {
+		a.Tray.Destroy()
+	}
 	a.MySQL.Stop()
 	a.Pgweb.Stop()       // D-08: stop pgweb before PostgreSQL (pgweb depends on PG)
 	a.PostgreSQL.Stop()
@@ -452,6 +453,11 @@ func (a *App) OpenWebAdmin(name string) error {
 		return browser.OpenURL(url)
 	}
 
+	if name == "pgweb" {
+		a.Debug.Info("OpenWebAdmin: pgweb via direct manager")
+		return browser.OpenURL(a.Pgweb.URL())
+	}
+
 	return fmt.Errorf("web admin %q not found", name)
 }
 
@@ -669,6 +675,88 @@ func (a *App) GetDashboardStatus() DashboardStatus {
 // GetSites returns all configured site virtual hosts.
 func (a *App) GetSites() []sites.Site {
 	return a.Sites.List()
+}
+
+// GetTraySites returns sorted (newest-first), capped site info for the tray menu.
+// Satisfies tray.AppController.GetTraySites (D-04: newest first, D-05: cap at 15).
+func (a *App) GetTraySites() []tray.SiteInfo {
+	raw := a.Sites.List()
+	// D-04: Sort newest first. RFC3339 is lexicographically sortable.
+	sort.Slice(raw, func(i, j int) bool {
+		return raw[i].CreatedAt > raw[j].CreatedAt
+	})
+	const maxSites = 15
+	if len(raw) > maxSites {
+		raw = raw[:maxSites]
+	}
+	items := make([]tray.SiteInfo, len(raw))
+	for i, s := range raw {
+		scheme := "https"
+		if !s.SSLEnabled {
+			scheme = "http"
+		}
+		items[i] = tray.SiteInfo{
+			Domain: s.Domain,
+			URL:    scheme + "://" + s.Domain,
+			Label:  s.Domain, // D-06 discretion: domain-only label
+		}
+	}
+	return items
+}
+
+// OpenSiteInBrowser opens the given site domain in the default browser.
+// Satisfies tray.AppController.OpenSiteInBrowser (D-03: https if SSL enabled).
+func (a *App) OpenSiteInBrowser(domain string) {
+	a.Debug.Info("OpenSiteInBrowser called: %s", domain)
+	for _, s := range a.Sites.List() {
+		if s.Domain == domain {
+			scheme := "https"
+			if !s.SSLEnabled {
+				scheme = "http"
+			}
+			_ = browser.OpenURL(scheme + "://" + domain)
+			return
+		}
+	}
+	// Domain not found in config -- best-effort https.
+	_ = browser.OpenURL("https://" + domain)
+}
+
+// GetWebAdminItems returns install status for phpMyAdmin (via registry) and pgweb
+// (via direct Manager field -- pgweb is NOT registered as a WebAdminService).
+// Satisfies tray.AppController.GetWebAdminItems (D-07, D-08).
+func (a *App) GetWebAdminItems() []tray.WebAdminItem {
+	var items []tray.WebAdminItem
+	// phpMyAdmin via WebAdmin registry
+	if pma, err := a.Manager.GetWebAdmin("phpmyadmin"); err == nil {
+		items = append(items, tray.WebAdminItem{
+			Name:      "phpmyadmin",
+			Label:     "Open phpMyAdmin",
+			Installed: pma.IsInstalled(),
+			URL:       pma.URL(),
+		})
+	}
+	// pgweb via direct Manager field (NOT in WebAdmin registry -- RESEARCH pitfall 1)
+	items = append(items, tray.WebAdminItem{
+		Name:      "pgweb",
+		Label:     "Open pgweb",
+		Installed: a.Pgweb.IsInstalled(),
+		URL:       a.Pgweb.URL(),
+	})
+	return items
+}
+
+// GetTotalSiteCount returns the total number of configured sites.
+// Used by tray to compute overflow count for the "(+N more)" label.
+func (a *App) GetTotalSiteCount() int {
+	return len(a.Sites.List())
+}
+
+// OpenWebAdminInBrowser opens the named web admin tool in the default browser.
+// Fire-and-forget wrapper for tray.AppController (no error return).
+func (a *App) OpenWebAdminInBrowser(name string) {
+	a.Debug.Info("OpenWebAdminInBrowser called: %s", name)
+	_ = a.OpenWebAdmin(name)
 }
 
 // CreateSite creates an Nginx virtual host and SSL certificate for the given

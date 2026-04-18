@@ -36,6 +36,19 @@ jobs:
 
       - name: Build universal .app
         run: wails build -platform darwin/universal -clean
+        env:
+          CGO_ENABLED: "1"
+
+      - name: Verify CGO tray linkage
+        run: |
+          BINARY="build/bin/LamboServer.app/Contents/MacOS/LamboServer"
+          echo "Checking Cocoa.framework linkage..."
+          otool -L "$BINARY" | grep -q "Cocoa.framework" || { echo "FAIL: Cocoa.framework not linked"; exit 1; }
+          echo "OK: Cocoa.framework linked"
+          echo "Checking universal binary..."
+          lipo -info "$BINARY" | grep -q "x86_64" || { echo "FAIL: missing x86_64 arch"; exit 1; }
+          lipo -info "$BINARY" | grep -q "arm64" || { echo "FAIL: missing arm64 arch"; exit 1; }
+          echo "OK: Universal binary (arm64 + x86_64)"
 
       - name: Ad-hoc codesign
         run: |
