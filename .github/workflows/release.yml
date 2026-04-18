@@ -56,9 +56,8 @@ jobs:
       - name: Ad-hoc codesign
         run: |
           BINARY="build/bin/LamboServer.app/Contents/MacOS/LamboServer"
-          # Sign the main binary first (--deep is deprecated and unreliable)
-          codesign --force --sign - --entitlements build/darwin/entitlements.plist --options runtime "$BINARY"
-          # Sign the app bundle
+          # Sign the main binary first, then the bundle (--deep is deprecated and unreliable)
+          codesign --force --sign - --entitlements build/darwin/entitlements.plist "$BINARY"
           codesign --force --sign - --entitlements build/darwin/entitlements.plist build/bin/LamboServer.app
           codesign --verify build/bin/LamboServer.app
 

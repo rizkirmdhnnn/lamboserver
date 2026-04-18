@@ -23,9 +23,8 @@ xattr -cr "${APP_PATH}"
 echo "  Extended attributes cleared"
 
 echo "[4/6] Ad-hoc signing with entitlements..."
-# Sign the main binary directly (--deep is deprecated and unreliable)
-codesign --force --sign - --entitlements "${ENTITLEMENTS}" --options runtime "${BINARY}"
-# Sign the app bundle
+# Sign the main binary first, then the bundle (--deep is deprecated and unreliable)
+codesign --force --sign - --entitlements "${ENTITLEMENTS}" "${BINARY}"
 codesign --force --sign - --entitlements "${ENTITLEMENTS}" "${APP_PATH}"
 codesign --verify "${APP_PATH}"
 echo "  Signature verified"
