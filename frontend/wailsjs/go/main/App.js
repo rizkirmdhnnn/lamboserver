@@ -6,6 +6,10 @@ export function ClearDebugLog() {
   return window['go']['main']['App']['ClearDebugLog']();
 }
 
+export function Context() {
+  return window['go']['main']['App']['Context']();
+}
+
 export function CreateServiceDatabase(arg1, arg2) {
   return window['go']['main']['App']['CreateServiceDatabase'](arg1, arg2);
 }
@@ -86,6 +90,18 @@ export function GetSites() {
   return window['go']['main']['App']['GetSites']();
 }
 
+export function GetTotalSiteCount() {
+  return window['go']['main']['App']['GetTotalSiteCount']();
+}
+
+export function GetTraySites() {
+  return window['go']['main']['App']['GetTraySites']();
+}
+
+export function GetWebAdminItems() {
+  return window['go']['main']['App']['GetWebAdminItems']();
+}
+
 export function GetWebAdminURL(arg1) {
   return window['go']['main']['App']['GetWebAdminURL'](arg1);
 }
@@ -130,8 +146,16 @@ export function OpenPgweb() {
   return window['go']['main']['App']['OpenPgweb']();
 }
 
+export function OpenSiteInBrowser(arg1) {
+  return window['go']['main']['App']['OpenSiteInBrowser'](arg1);
+}
+
 export function OpenWebAdmin(arg1) {
   return window['go']['main']['App']['OpenWebAdmin'](arg1);
+}
+
+export function OpenWebAdminInBrowser(arg1) {
+  return window['go']['main']['App']['OpenWebAdminInBrowser'](arg1);
 }
 
 export function ReadLog(arg1, arg2) {
