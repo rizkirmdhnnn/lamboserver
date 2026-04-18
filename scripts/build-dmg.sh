@@ -94,17 +94,34 @@ done
 echo "  Gate 2 passed: all 6 entitlements present"
 
 echo "[6/7] Packaging DMG..."
-STAGING=$(mktemp -d)
-cp -r "${APP_PATH}" "${STAGING}/"
-# Clear xattrs on the staging copy so DMG contents are clean
-xattr -cr "${STAGING}/${APP_NAME}.app"
-ln -s /Applications "${STAGING}/Applications"
-hdiutil create \
-  -volname "${APP_NAME}" \
-  -srcfolder "${STAGING}" \
-  -ov \
-  -format UDZO \
-  "${DMG_OUT}"
+# D-05: fail fast if create-dmg is missing (local dev path; CI installs it in a dedicated step)
+command -v create-dmg >/dev/null || { echo "FAIL: create-dmg not installed. Run: brew install create-dmg"; exit 1; }
+# Clear xattrs on the source app so DMG contents are clean (preserved behavior from the removed hdiutil staging step)
+xattr -cr "${APP_PATH}"
+# Remove any prior DMG at the target path so create-dmg does not prompt for overwrite in non-interactive runs
+rm -f "${DMG_OUT}"
+# D-01..D-03, D-06, D-13..D-17: create-dmg builds the polished DMG in one shot.
+# --no-code-sign (D-02): .app is already ad-hoc signed; DMG container signing adds no Gatekeeper benefit for ad-hoc.
+# --sandbox-safe (D-03): headless CI compatibility (no AppleScript-only features).
+# --volname (D-17): stable /Volumes/LamboServer (no version suffix — avoids stacked mount points).
+# --window-size 660 400 (D-13), --icon-size 128 (D-14): layout locked by DMG-01.
+# --icon / --app-drop-link at (165,220) and (495,220) (D-15).
+# --background reads build/darwin/dmg-background.png; create-dmg picks up @2x sibling automatically (D-12, DMG-03).
+# Positional args: <output_dmg> <source_dir_or_app>. Passing ${DMG_OUT} preserves Phase 6 filename contract (D-06).
+create-dmg \
+  --volname "${APP_NAME}" \
+  --window-size 660 400 \
+  --icon-size 128 \
+  --background "build/darwin/dmg-background.png" \
+  --icon "${APP_NAME}.app" 165 220 \
+  --app-drop-link 495 220 \
+  --no-code-sign \
+  --sandbox-safe \
+  "${DMG_OUT}" \
+  "${APP_PATH}"
+# Gate: confirm create-dmg actually produced the expected file (defensive — preserves Phase 6 CI upload contract)
+test -f "${DMG_OUT}" || { echo "FAIL: create-dmg did not produce ${DMG_OUT}"; exit 1; }
+echo "  DMG created: ${DMG_OUT}"
 
 echo "[7/7] Generating SHA-256 checksum..."
 shasum -a 256 "${DMG_OUT}" > "${DMG_OUT}.sha256"
