@@ -43,9 +43,29 @@ jobs:
           CGO_ENABLED: "1"
           VERSION: ${{ steps.version.outputs.VERSION }}
 
+      - name: Compose release notes
+        run: |
+          VERSION="${{ steps.version.outputs.VERSION }}"
+          DIGEST=$(cut -d' ' -f1 "LamboServer-${VERSION}.dmg.sha256")
+          {
+            cat .github/RELEASE_NOTES_TEMPLATE.md
+            echo ""
+            echo "## Verification"
+            echo ""
+            echo "SHA-256 checksum for \`LamboServer-${VERSION}.dmg\`:"
+            echo '```'
+            echo "${DIGEST}  LamboServer-${VERSION}.dmg"
+            echo '```'
+            echo ""
+            echo "Verify with: \`shasum -c LamboServer-${VERSION}.dmg.sha256\`"
+          } > /tmp/release-notes-final.md
+
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           name: LamboServer ${{ github.ref_name }}
+          body_path: /tmp/release-notes-final.md
           generate_release_notes: true
-          files: LamboServer-${{ steps.version.outputs.VERSION }}.dmg
+          files: |
+            LamboServer-${{ steps.version.outputs.VERSION }}.dmg
+            LamboServer-${{ steps.version.outputs.VERSION }}.dmg.sha256
