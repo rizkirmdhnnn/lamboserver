@@ -97,7 +97,8 @@ wails dev
 
 ```bash
 # Install DMG packaging tool (one-time, local dev only; CI installs this automatically)
-brew install create-dmg
+# Uses sindresorhus/create-dmg (npm) — zero-config, auto-composes drag-to-Applications visual.
+npm install --global create-dmg
 
 # Build .app
 wails build -platform darwin/universal -clean
